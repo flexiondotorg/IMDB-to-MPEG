@@ -35,9 +35,10 @@ You can also pass in 'preview' as the IMDB ID in which case the script will
 match on title only and exit after displaying a text preview of the film 
 summary.
 
-Directories for each matching genre are created (not Windows). The MPEG-2 is 
-stored in the 'All' genre and then symlinked to all the genres for that film. 
-This creates a genre categorisation that I use to store the imported DVD into.
+Directories for each matching genre are created and also one for the IMDB rating
+(rounded down). The MPEG-2 is stored in the 'All' folder and then symlinked to 
+the genres and rating for that film. I then import my DVD into the 'All' folder
+for that film and the categoriation
 
 Requirements:
 
