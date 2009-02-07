@@ -31,8 +31,9 @@ provide a second argument of the IMDB ID. For example...
 
 php imdb2mpeg.php "The Waiting Room" 0902348
 
-You can also pass in 'test' as the IMDB ID in which case the script will match
-on title only and exit after displaying a text preview of the film summary.
+You can also pass in 'preview' as the IMDB ID in which case the script will 
+match on title only and exit after displaying a text preview of the film 
+summary.
 
 Directories for each matching genre are created (not Windows). The MPEG-2 is 
 stored in the 'All' genre and then symlinked to all the genres for that film. 
@@ -213,6 +214,9 @@ if (!empty($movie_genres))
 
 // Rating and Votes
 $movie_rating = $movie->rating();
+$point_pos = strpos($movie_rating, '.');
+$basic_rating = substr($movie_rating, 0, $point_pos);
+
 $movie_votes  = $movie->votes();
 if (!empty($movie_rating) && !empty($movie_votes)) 
 { 
@@ -227,8 +231,8 @@ print("---\n");
 print($movie_text);
 print("---\n");
 
-// If 'test' was passed in as the second agument, exit now.
-if ( $imdb_id == "test")
+// If 'preview' was passed in as the second agument, exit now.
+if ( $imdb_id === 'preview' )
 {
     exit();
 }
@@ -287,13 +291,15 @@ if (!empty($movie_genres))
     {                           
         if ($i == 0)
         {
-            @mkdir('Genres/All/' . $out_filename, 0777, true);                            
-            copy($mpg_filename, 'Genres/All/' . $out_filename . '/' . $mpg_filename);         
+            @mkdir('All/' . $out_filename, 0777, true);                            
+            @mkdir('Ratings/' . $basic_rating, 0777, true);                            
+            copy($mpg_filename, 'All/' . $out_filename . '/' . $mpg_filename);
+            @symlink('../../All/' . $out_filename, 'Ratings/' . $basic_rating . '/' . $out_filename);                                             
         }        
 
         @mkdir('Genres/' . str_cleaner($movie_genres[$i]), 0777, true);                                                    
-        @symlink('../All/' . $out_filename, 'Genres/' . str_cleaner($movie_genres[$i]) . '/' . $out_filename);                        
-    }        
+        @symlink('../../All/' . $out_filename, 'Genres/' . str_cleaner($movie_genres[$i]) . '/' . $out_filename);                        
+    }            
 }
 
 //Clean up.
