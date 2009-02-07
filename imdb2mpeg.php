@@ -31,6 +31,9 @@ provide a second argument of the IMDB ID. For example...
 
 php imdb2mpeg.php "The Waiting Room" 0902348
 
+You can also pass in 'test' as the IMDB ID in which case the script will match
+on title only and exit after displaying a text preview of the film summary.
+
 Directories for each matching genre are created (not Windows). The MPEG-2 is 
 stored in the 'All' genre and then symlinked to all the genres for that film. 
 This creates a genre categorisation that I use to store the imported DVD into.
@@ -148,7 +151,6 @@ else
     print("Match found\n");
 }
 
-
 print("Formatting text\n");
 $movieid = $movies[0];
 $movie = new imdb($movieid);
@@ -224,6 +226,12 @@ $movie_text = wordwrap($movie_text, 52, "\n", true);
 print("---\n");
 print($movie_text);
 print("---\n");
+
+// If 'test' was passed in as the second agument, exit now.
+if ( $imdb_id == "test")
+{
+    exit();
+}
 
 //Format the image/video filename to remove spaces and such.
 $out_filename = str_replace(' ', '_', $movie_title);
