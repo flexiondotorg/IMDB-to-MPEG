@@ -153,6 +153,23 @@ else
     print("Match found\n");
 }
 
+// If 'list' was passed in as the second agument, list a summary of the seach 
+// matches and exit.
+if ( $imdb_id === 'list' )
+{
+    for ($loop = 0; $loop < count($movies); $loop++ )
+    {
+        //print($movies[$loop] . "\n");
+        $temp_movieid = $movies[$loop];
+        $temp_movie = new imdb($temp_movieid);
+        $temp_movie->setid($temp_movieid);        
+        
+        $temp_movie_title = str_cleaner($temp_movie->title(), true); 
+        $temp_movie_text = $temp_movieid . ' ' . $temp_movie_title . ' (' . str_cleaner($temp_movie->year()) . ")\n";
+        print($temp_movie_text);
+    }
+}
+
 print("Formatting text\n");
 $movieid = $movies[0];
 $movie = new imdb($movieid);
