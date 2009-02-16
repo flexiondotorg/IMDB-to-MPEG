@@ -168,6 +168,7 @@ if ( $imdb_id === 'list' )
         $temp_movie_text = $temp_movieid . ' ' . $temp_movie_title . ' (' . str_cleaner($temp_movie->year()) . ")\n";
         print($temp_movie_text);
     }
+    exit();    
 }
 
 print("Formatting text\n");
