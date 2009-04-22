@@ -74,15 +74,17 @@ php imdb2mpeg.php "One Fine Day"
 php imdb2mpeg.php "Batman"
 php imdb2mpeg.php "Batman Forever"
 php imdb2mpeg.php "Batman Returns"
+php imdb2mpeg.php "Batman and Robin"
 php imdb2mpeg.php "Gallipoli"
 php imdb2mpeg.php "Independence Day"
 php imdb2mpeg.php "xXx The Next Level"
-php imdb2mpeg.php "American Pie"
 php imdb2mpeg.php "The Waiting Room" 0902348
 php imdb2mpeg.php "Herbie Fully Loaded"
 php imdb2mpeg.php "Hero"
 php imdb2mpeg.php "American Pie 2"
+php imdb2mpeg.php "American Wedding"
 php imdb2mpeg.php "Shrek The Halls"
+php imdb2mpeg.php "Shrek"
 php imdb2mpeg.php "Shrek 2"
 php imdb2mpeg.php "Blindness"
 php imdb2mpeg.php "Body of Lies"
@@ -98,3 +100,48 @@ php imdb2mpeg.php "Death Proof"
 php imdb2mpeg.php "Death Race"
 php imdb2mpeg.php "Napoleon Dynamite"
 php imdb2mpeg.php "Cliffhanger"
+php imdb2mpeg.php "Elephants Dream"
+php imdb2mpeg.php "The Mummy"
+php imdb2mpeg.php "The Mummy Returns"
+php imdb2mpeg.php "The Worlds Fastest Indian"
+php imdb2mpeg.php "Lara Croft Tomb Raider The Cradle of Life"
+php imdb2mpeg.php "You've Got Mail"
+php imdb2mpeg.php "Star Trek Nemesis" 0253754
+php imdb2mpeg.php "School of Rock"
+php imdb2mpeg.php "The Naked Gun 2"
+php imdb2mpeg.php "A Life Less Ordinary"
+php imdb2mpeg.php "A River Runs Through It"
+php imdb2mpeg.php "Arlington Road"
+php imdb2mpeg.php "Back to the Future Part II"
+php imdb2mpeg.php "Changeling"
+php imdb2mpeg.php "Crank"
+php imdb2mpeg.php "Seven Pounds"
+php imdb2mpeg.php "The Butterfly Effect"
+php imdb2mpeg.php "Transporter 3"
+php imdb2mpeg.php "Flash of Genius"
+php imdb2mpeg.php "God on Trial"
+php imdb2mpeg.php "Incendiary"
+php imdb2mpeg.php "Thick as Thieves"
+php imdb2mpeg.php "Twilight"
+php imdb2mpeg.php "Viva" 0393956
+php imdb2mpeg.php "Star Wars Holiday Special"
+php imdb2mpeg.php "Bear Island"
+php imdb2mpeg.php "Brokeback Mountain"
+php imdb2mpeg.php "Alive"
+php imdb2mpeg.php "Amélie"
+
+# Not yet done
+php imdb2mpeg.php "American Pie"
+
+
+
+# BMW Shorts - Season 1
+#php imdb2mpeg.php "Ambush" 0283875
+#php imdb2mpeg.php "Chosen" 0283994
+#php imdb2mpeg.php "The Follow" 0283994
+#php imdb2mpeg.php "Star" 0286151
+#php imdb2mpeg.php "Powder Keg"
+# BMW Shorts - Season 2
+#php imdb2mpeg.php "Hostage" 0338111
+#php imdb2mpeg.php "Ticker" 0340398
+
