@@ -1,8 +1,7 @@
-Creates a MPEG2 video summarising a film using IMDB data.
-
-Copyright (c) 2009 Flexion.Org, http://flexion.org/
-
 License
+
+Uses IMDB to create a MPEG2 video summary of a film.
+Copyright (c) 2009 Flexion.Org, http://flexion.org/
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -18,6 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+The fonts are distributed under the following copyright:
+Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved. Bitstream Vera is a 
+trademark of Bitstream, Inc.
+
+The fonts have a generous copyright, allowing derivative works (as long as 
+"Bitstream" or "Vera" are not in the names), and full redistribution (so long as 
+they are not *sold* by themselves). They can be be bundled, redistributed and 
+sold with any software.
+
 Introduction
 
 I run Mediatomb DLNA server with my PS3 as the client. I am working towards 
@@ -31,9 +39,30 @@ Usage
 
 This scripts takes one parameter as input, a film title. The plotline, year of 
 release, genres, cast list and running time for that film are gathered from IMDB 
-and formatted as text. That text is converted into an image and then encoded 
-into a MPEG-2 video using the lowest possible bitrate/resolution that is 
-acceptable to read when viewing on a 42" plasma from my sofa.
+and formatted as text. Here is an example.
+
+---
+The Usual Suspects (1995)
+
+A boat has been destroyed, criminals are dead, and
+the key to this mystery lies with the only
+survivor and his twisted, convoluted story
+beginning with five career crooks in a seemingly
+random police lineup. (106 mins)
+
+Starring Stephen Baldwin as Michael McManus,
+Gabriel Byrne as Dean Keaton, Benicio Del Toro as
+Fred Fenster, Kevin Pollak as Todd Hockney, and
+Kevin Spacey as Roger 'Verbal' Kint.
+
+Genres: Crime, Mystery, Thriller.
+
+Rated 8.7 out of 10 from 227,964 votes.
+---
+
+The text is converted into an image and then encoded into a MPEG-2 video using 
+the lowest possible bitrate/resolution that is acceptable to read when viewing 
+on a 42" plasma from my sofa. 
 
 If the film title has spaces it should be wrapped in double quotes.
 
@@ -63,9 +92,7 @@ will just displaying a text preview of the film summary.
 Directories for each matching genre are created and also one for the IMDB rating
 (rounded down). The MPEG-2 is stored in the 'All' folder and then symlinked to 
 the genres and rating for that film. I then copy my video into the appropriate 
-directory in 'All'.
-
-For example.
+directory in 'All'. For example.
 
 .
 |-- All
@@ -81,11 +108,11 @@ For example.
 
 Requirements
 
- - This script requires the PHP5 cli. PHP4 will not work
- - This script requires the GD module for PHP
- - This script requires the imdbphp and texttoimage libraries (included)
- - This script requires 'jpeg2yuv' and 'mpeg2enc' to create the MPEG-2 videos
- - This script requires a Unix like OS such as Linux, FreeBSD, etc.
+ - PHP5 cli. PHP4 will not work
+ - The GD module for PHP
+ - The imdbphp and texttoimage libraries (included)
+ - 'jpeg2yuv', 'mpeg2enc', 'toolame' and 'mplex' to create the MPEG-2 videos
+ - A real OS such as Linux, FreeBSD, Solaris, maybe even Mac OS X, etc.
 
 Known Limitations
 

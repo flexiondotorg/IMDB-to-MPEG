@@ -1,6 +1,6 @@
 <?php
 /*
-Creates a MPEG2 video summarising a film using IMDB data.
+Uses IMDB to create a MPEG2 video summary of a film.
 
 Copyright (c) 2009 Flexion.Org, http://flexion.org/
 
@@ -18,6 +18,13 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+
+$VER="1.0";
+
+echo("IMDB-to-MPG v$VER - Uses IMDB to create a MPEG2 video summary of a film.\n");
+echo("Copyright (c) 2009 Flexion.Org, http://flexion.org. GPLv2 License.\n");
+echo("\n");
+
 
 require('imdbphp-1.1.3/imdb.class.php');
 require('texttoimage-1.0/TextToImage.class.php');
@@ -44,7 +51,7 @@ if ($argc < 2)
 	echo("ERROR! You must supply a movie title to lookup and an option IMDB ID.\n");
     echo("For example:\n");
 	echo("\n");
-	echo('  php5 imdb2mpeg.php "The Usual Suspects"' . " 0114814\n");
+	echo('  php5 IMDB-to-MPEG.php "The Usual Suspects"' . " 0114814\n");
 	exit;
 }
 else
@@ -206,7 +213,7 @@ if (!empty($movie_rating) && !empty($movie_votes))
 
 // Word wrap the text, this needs manual tweaking to work with the font size in 
 // the makeImageF() method and the JPEG resolution.  
-$movie_text = wordwrap($movie_text, 52, "\n", true);
+$movie_text = wordwrap($movie_text, 50, "\n", true);
 
 print("---\n");
 print($movie_text);
@@ -237,7 +244,7 @@ $_im = new TextToImage();
 
 // Yes, we do need to reduce the audio length by 0.1?! Failing to do so will 
 // result in a good deal of the muxing to fail due a bit mismatch in the audio 
-// stream. No idea why the fudge works and why things don't work without it.
+// stream. 
 $movie_length = 20;
 $audio_freq = 16;
 $audio_loop = ( ($movie_length - 0.1) * 1000) * $audio_freq;
@@ -247,13 +254,13 @@ $movie_mux_cmd = 'mplex -v 0 -f 8 -o ' . $mpg_filename . ' ' . $m2v_filename . '
 
 if ($video_format == "PAL")
 {
-    $_im->makeImageF($movie_text, './Arial.ttf', 704, 576, 0, 0, 20, array(0xFF, 0xFF, 0xFF), array(0x0, 0x0, 0x0));    
+    $_im->makeImageF($movie_text, './Vera.ttf', 704, 576, 0, 0, 20, array(0xFF, 0xFF, 0xFF), array(0x0, 0x0, 0x0));    
     $frame_loop = (25 * $movie_length);        
     $movie_mpeg_cmd = 'jpeg2yuv -v 0 -j ' . $out_filename . '_%03d.jpg -l ' . $frame_loop . ' -f 25 -I p | mpeg2enc -v 0 -b 512 -f 8 -a 1 -n n -F 3 -o ' . $m2v_filename;
 }
 else //make NTSC by default
 {
-    $_im->makeImageF($movie_text, './Arial.ttf', 704, 480, 0, 0, 20, array(0xFF, 0xFF, 0xFF), array(0x0, 0x0, 0x0));
+    $_im->makeImageF($movie_text, './Vera.ttf', 704, 480, 0, 0, 20, array(0xFF, 0xFF, 0xFF), array(0x0, 0x0, 0x0));
     $frame_loop = (24 * $movie_length);    
     $movie_mpeg_cmd = 'jpeg2yuv -v 0 -j ' . $out_filename . '_%03d.jpg -l ' . $frame_loop . ' -f 24 -I p | mpeg2enc -v 0 -b 512 -f 8 -a 1 -n n -F 2 -o ' . $m2v_filename;    
 }
@@ -289,5 +296,5 @@ unlink($m2v_filename);
 unlink($mp2_filename);
 unlink($mpg_filename);
 
-print("Done.\n");
+print("All Done!\n");
 ?>
