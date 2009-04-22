@@ -1,69 +1,22 @@
 <?php
 /*
-What does it do?
+Creates a MPEG2 video summarising a film using IMDB data.
 
-This scripts takes one parameter as input, a film title. The plotline, year of 
-release, genres, cast list and running time for that film are gathered from IMDB 
-and formatted as text. That text is converted into an image and then encoded 
-into a MPEG-2 video using the lowest possible bitrate/resolution that is 
-acceptable to read when viewing on a 42" plasma from my sofa.
+Copyright (c) 2009 Flexion.Org, http://flexion.org/
 
-Why did I write this?
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
 
-I run Mediatomb DLNA server with my PS3 as the client. I am working towards 
-importing my entire DVD collection into my Mediatomb server. However, my wife 
-wants to know something about each film in the library without having to dig out 
-the DVD case from storage. My solution is to include a MPEG-2 video displaying 
-the film summary in the Mediatomb library for each DVD I have imported so it can
-be easily viewed from the PS3.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-Usage: 
-
-If the film title has spaces it should be wrapped in double quotes.
-
- php5 imdb2mpeg Jumper
- php5 imdb2mpeg "Batman Begins"
-
-If there is a possibility that the movie you are searching for may hit another
-title first then you can run in 'list' mode. This will produce a list of
-matching titles and includes the IMDB ID and year of relase to help you narrow 
-down your selection.
-
- php imdb2mpeg.php "The Waiting Room" list
-
-The first film which matches the search string will be used, which works fine 
-for me so long as I am fairly accurate with my title string. Very occasionally I
-the first search string match is not the right film and for those cases you can
-provide a second argument of the IMDB ID. For example...
-
- php5 imdb2mpeg.php "The Waiting Room" 0902348
-
-You can also pass in 'preview' as the IMDB ID in which case the script will 
-match on title only and exit after displaying a text preview of the film 
-summary.
-
- php5 imdb2mpeg.php "Airplane" preview
-
-Directories for each matching genre are created and also one for the IMDB rating
-(rounded down). The MPEG-2 is stored in the 'All' folder and then symlinked to 
-the genres and rating for that film. I then import my DVD into the 'All' folder
-for that film and the categoriation
-
-Requirements:
-
-This script requires the PHP5 cli. PHP4 will not work
-This script requires the GD module for PHP
-This script requires the imdbphp and texttoimage libraries (included)
-This script requires 'jpeg2yuv' and 'mpeg2enc' to create the MPEG-2 videos
-This script requires a Unix like OS such as Linux, FreeBSD, etc.
-
-This code was lashed up in a few hours, it ain't pretty but it works for me on 
-my Ubuntu Linux systems, maybe it'll work for you too ;-)
-
-References:
-
- - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
- - http://projects.izzysoft.de/trac/imdbphp
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 require('imdbphp-1.1.3/imdb.class.php');

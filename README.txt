@@ -92,6 +92,14 @@ Known Limitations
 This code was lashed up in a few hours, it ain't pretty but it works for me on 
 my Ubuntu Linux systems, maybe it'll work for you too ;-)
 
+Source Code
+
+You can checkout the current branch from my Bazaar repository. This is a 
+read-only repository, get in touch if you want to contribute and require write 
+access.
+
+ bzr co http://code.flexion.org/Bazaar/IMDB-to-MPEG/
+
 References
 
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
