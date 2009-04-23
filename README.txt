@@ -111,10 +111,7 @@ directory in 'All'. For example.
 
 Requirements
 
- - PHP5 cli. PHP4 will not work
- - The GD module for PHP
- - The imdbphp and texttoimage libraries (included)
- - 'jpeg2yuv', 'mpeg2enc', 'toolame' and 'mplex' to create the MPEG-2 videos
+ - dd, jpeg2yuv, mpeg2enc, mplex, php5-cli, php5-gd, toolame.
  - A real OS such as Linux, FreeBSD, Solaris, maybe even Mac OS X, etc.
 
 Known Limitations
