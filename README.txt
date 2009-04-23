@@ -66,7 +66,7 @@ on a 42" plasma from my sofa.
 
 If the film title has spaces it should be wrapped in double quotes.
 
- php5 IMDB-to-MPEG.php Jumper
+ php5 IMDB-to-MPEG.php Batman
  php5 IMDB-to-MPEG.php "Batman Begins"
 
 The first IMDB entry that matches the search string will be used, which works 
@@ -77,17 +77,17 @@ title first. In which case you can use 'list' mode. This will produce a list of
 matching titles and includes the IMDB ID and year of relase to help you narrow 
 down your selection.
 
- php IMDB-to-MPEG.php "The Waiting Room" list
+ php IMDB-to-MPEG.php "The Usual Suspects" list
 
 Once you have identified the film you are after simply provide a second argument 
 which is the IMDB ID. For example...
 
- php5 IMDB-to-MPEG.php "The Waiting Room" 0902348
+ php5 IMDB-to-MPEG.php "The Usual Suspects" 0114814
 
 You can also pass in 'preview' as the second arguament in which case the script 
 will just displaying a text preview of the film summary.
 
- php5 IMDB-to-MPEG.php "The Waiting Room" preview
+ php5 IMDB-to-MPEG.php "The Usual Suspects" preview
 
 Directories for each matching genre are created and also one for the IMDB rating
 (rounded down). The MPEG-2 is stored in the 'All' folder and then symlinked to 
@@ -96,15 +96,18 @@ directory in 'All'. For example.
 
 .
 |-- All
-|   `-- The_Waiting_Room
-|       |-- About_The_Waiting_Room.mpg
-|       `-- The_Waiting_Room.mpg
+|   `-- The_Usual_Suspects
+|       `-- About_The_Usual_Suspects.mpg
 |-- Genres
-|   `-- Drama
-|       `-- The_Waiting_Room -> ../../All/The_Waiting_Room
+|   |-- Crime
+|   |   `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
+|   |-- Mystery
+|   |   `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
+|   `-- Thriller
+|       `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
 |-- Ratings
-    `-- 6
-        `-- The_Waiting_Room -> ../../All/The_Waiting_Room
+    `-- 8
+        `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
 
 Requirements
 
@@ -131,6 +134,10 @@ References
 
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
  - http://projects.izzysoft.de/trac/imdbphp
+
+v1.1 2009, 22nd April.
+ - Fixed a bug where the film name has a forward slash (/) in it the files and
+   directories failed to get created.
  
 v1.0 2009, 22nd April.
  - Initial release

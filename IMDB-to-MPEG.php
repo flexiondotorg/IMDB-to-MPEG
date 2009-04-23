@@ -19,12 +19,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-$VER="1.0";
+$VER="1.1";
 
 echo("IMDB-to-MPG v$VER - Uses IMDB to create a MPEG2 video summary of a film.\n");
 echo("Copyright (c) 2009 Flexion.Org, http://flexion.org. GPLv2 License.\n");
 echo("\n");
-
 
 require('imdbphp-1.1.3/imdb.class.php');
 require('texttoimage-1.0/TextToImage.class.php');
@@ -229,7 +228,7 @@ if ( $imdb_id === 'preview' )
 $out_filename = str_replace(' ', '_', $movie_title);
 $out_filename = str_replace('&', 'and', $out_filename);
 $out_filename = str_replace(array("'", ".", ",", ":"), '', $out_filename);
-$out_filename = str_replace(array("·"), '-', $out_filename);
+$out_filename = str_replace(array("·", "/"), '-', $out_filename);
 
 $jpeg_filename = $out_filename . '_000';
 $m2v_filename = $out_filename . '.m2v';
