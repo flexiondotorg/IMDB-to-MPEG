@@ -132,9 +132,10 @@ References
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
  - http://projects.izzysoft.de/trac/imdbphp
 
-v1.1 2009, 22nd April.
+v1.1 2009, 23rd April.
  - Fixed a bug where the film name has a forward slash (/) in it the files and
    directories failed to get created.
+ - Documentation improvements   
  
 v1.0 2009, 22nd April.
  - Initial release
