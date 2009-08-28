@@ -35,7 +35,7 @@ class TextToImage {
 		$background_color = imagecolorallocate($this->im, $bgcolor[0], $bgcolor[1], $bgcolor[2]);		//RGB color background.
 		$text_color = imagecolorallocate($this->im, $color[0], $color[1], $color[2]);			//RGB color text.
 				
-		imagettftext($this->im, $fsize, $X, $Y, $fsize, $text_color, $font, $text);
+		imagettftext($this->im, $fsize, 0, $X, $Y, $text_color, $font, $text);
     }
     
     /**

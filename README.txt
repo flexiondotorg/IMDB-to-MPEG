@@ -1,6 +1,6 @@
 License
 
-Uses IMDB to create a MPEG2 video summary of a film.
+Create a MPEG video summarising a movie using data from IMDB
 Copyright (c) 2009 Flexion.Org, http://flexion.org/
 
 This program is free software; you can redistribute it and/or
@@ -29,17 +29,31 @@ sold with any software.
 Introduction
 
 I run Mediatomb DLNA server with my PS3 as the client. I am working towards 
-importing my entire DVD collection into my Mediatomb server. However, my wife 
-wants to know something about each film in the library without having to dig out 
-the DVD case from storage. My solution is to include a MPEG-2 video displaying 
-the film summary in the Mediatomb library for each DVD I have imported so it can
-be easily viewed from the PS3.
+importing my entire DVD and Blu-Ray collection into my Mediatomb server. 
+However, my wife wants to know something about each film in the library without 
+having to dig out the DVD case from storage. My solution is to include a MPEG 
+video displaying the film summary in the Mediatomb library for each DVD I have 
+imported so it can be easily viewed from the PS3.
 
 Usage
 
-This scripts takes one parameter as input, a film title. The plotline, year of 
-release, genres, cast list and running time for that film are gathered from IMDB 
-and formatted as text. Here is an example.
+This scripts requires at least one argument as input, the filename of a file. 
+By default the script will try to lookup the film based on the filename you
+provided. In addition you can provide some optional arguments to help find the 
+correct film. For example...
+
+Search by title by passing the optional title argument -t. If the film title has 
+spaces it should be wrapped in double quotes.
+
+ ./IMDB-to-MPEG.php -t "Usual Suspects" ~/Videos/The_Usual_Suspects.mpg
+ 
+Search by IMDB ID by passing the optional IMDB ID argument -i 
+ 
+ ./IMDB-to-MPEG.php -i 0114814 ~/Videos/The_Usual_Suspects.mpg 
+
+The plotline, year of release, genres, cast list and running time for that film 
+are gathered from IMDB and formatted as text. You'll be prompted to confirm that
+this is the film you are seeking. Here is an example.
 
 ---
 The Usual Suspects (1995)
@@ -58,46 +72,26 @@ Kevin Spacey as Roger 'Verbal' Kint.
 Genres: Crime, Mystery, Thriller.
 
 Rated 8.7 out of 10 from 227,964 votes.
----
 
-The text is converted into an image and then encoded into a MPEG-2 video using 
-the lowest possible bitrate/resolution that is acceptable to read when viewing 
-on a 42" plasma from my sofa. 
-
-If the film title has spaces it should be wrapped in double quotes.
-
- php5 IMDB-to-MPEG.php Batman
- php5 IMDB-to-MPEG.php "Batman Begins"
+Use this movie [Y/n]:
 
 The first IMDB entry that matches the search string will be used, which works 
-fine most of the time so long as the title string is accurate.
-
-There is a possibility that the movie you are searching for get a hit for another
-title first. In which case you can use 'list' mode. This will produce a list of
-matching titles and includes the IMDB ID and year of relase to help you narrow 
-down your selection.
-
- php IMDB-to-MPEG.php "The Usual Suspects" list
-
-Once you have identified the film you are after simply provide a second argument 
-which is the IMDB ID. For example...
-
- php5 IMDB-to-MPEG.php "The Usual Suspects" 0114814
-
-You can also pass in 'preview' as the second arguament in which case the script 
-will just displaying a text preview of the film summary.
-
- php5 IMDB-to-MPEG.php "The Usual Suspects" preview
+fine most of the time so long as the title string is accurate. Should the search 
+result not be the film you are looking for you can select an alternative from 
+the list provided. Once a film has been selected the text is converted into an 
+image and then encoded into a MPEG video. 
 
 Directories for each matching genre are created and also one for the IMDB rating
-(rounded down). The MPEG-2 is stored in the 'All' folder and then symlinked to 
-the genres and rating for that film. I then copy my video into the appropriate 
-directory in 'All'. For example.
+(rounded down). The MPEG is stored in the 'All' folder and then sym-linked to 
+the genres and rating for that film. You will be prompted if you want the film 
+you supplied as input should be copied into the appropriate directory in 'All'.
+You will end up with something like this. 
 
 .
 |-- All
 |   `-- The_Usual_Suspects
 |       `-- About_The_Usual_Suspects.mpg
+|       `-- The_Usual_Suspects.mpg
 |-- Genres
 |   |-- Crime
 |   |   `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
@@ -129,8 +123,14 @@ access.
 
 References
 
+ - http://www.ypass.net/blog/2009/06/categorizing-your-movie-collection-with-imdb/
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
  - http://projects.izzysoft.de/trac/imdbphp
+
+v1.2 2009, 17th July.
+ - Merged extensive contributions from Eric, http://www.ypass.net
+ - Updated the README to reflect Eric's changes.
+ - Not publically released.
 
 v1.1 2009, 23rd April.
  - Fixed a bug where the film name has a forward slash (/) in it the files and
