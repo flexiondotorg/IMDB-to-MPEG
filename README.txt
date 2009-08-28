@@ -2,6 +2,7 @@ License
 
 Create a MPEG video summarising a movie using data from IMDB
 Copyright (c) 2009 Flexion.Org, http://flexion.org/
+Copyright (c) 2009 yPass.net, http://ypass.net/
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -36,6 +37,17 @@ video displaying the film summary in the Mediatomb library for each DVD I have
 imported so it can be easily viewed from the PS3.
 
 Usage
+
+  IMDB-to-MPEG.php -t "Move Title" -i 1234567 -o m4v -r 864x480 movie.mkv
+
+You can also pass several optional arguments
+  -a    : Automates execution by answering all prompts with the default response.
+  -t    : Provide a film title to search for.
+  -i    : Provide an IMDB ID to search for.
+  -o    : Set the MPEG output format: m4v (default), mp4, m2v or mpg.
+  -r    : Set the MPEG output resolution: 864x480 is the default.
+  -d    : Enable debug mode.
+  -h    : This help.
 
 This scripts requires at least one argument as input, the filename of a file. 
 By default the script will try to lookup the film based on the filename you
@@ -78,8 +90,19 @@ Use this movie [Y/n]:
 The first IMDB entry that matches the search string will be used, which works 
 fine most of the time so long as the title string is accurate. Should the search 
 result not be the film you are looking for you can select an alternative from 
-the list provided. Once a film has been selected the text is converted into an 
-image and then encoded into a MPEG video. 
+the list provided. Once a film has been selected the text is converted into a
+series of image and then encoded into a MPEG video. 
+
+The default behaviour is to encode a MPEG-4 video at a resolution of 864x480.
+You can optionally encode the video as MPEG-2 video. For example:
+
+ ./IMDB-to-MPEG.php -t "Usual Suspects" -o m2v ~/Videos/The_Usual_Suspects.mpg
+
+You can also change the resolution of the MPEG video independantly of the video 
+format. For example:
+
+ ./IMDB-to-MPEG.php -t "Usual Suspects" -r 640x480 ~/Videos/The_Usual_Suspects.mpg
+ ./IMDB-to-MPEG.php -t "Usual Suspects" -r 720x576 -o m2v ~/Videos/The_Usual_Suspects.mpg
 
 Directories for each matching genre are created and also one for the IMDB rating
 (rounded down). The MPEG is stored in the 'All' folder and then sym-linked to 
@@ -105,13 +128,16 @@ You will end up with something like this.
 
 Requirements
 
- - dd, jpeg2yuv, mpeg2enc, mplex, php5-cli, php5-gd, toolame.
+ - ffmpeg, jpeg2yuv, php5-cli, php5-gd
  - A real OS such as Linux, FreeBSD, Solaris, maybe even Mac OS X, etc.
 
 Known Limitations
 
-This code was lashed up in a few hours, it ain't pretty but it works for me on 
-my Ubuntu Linux systems, maybe it'll work for you too ;-)
+ - The script must be provide a filename as a required argument.
+ - The script can't be run in an automated fashion.
+ - I've found a few bugs in my code:
+     1. if a cover image doesn't exist, it fails
+     2. if only 1 result is returned, it fails
 
 Source Code
 
@@ -126,6 +152,13 @@ References
  - http://www.ypass.net/blog/2009/06/categorizing-your-movie-collection-with-imdb/
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
  - http://projects.izzysoft.de/trac/imdbphp
+
+v2.0 2009, 28th August.
+ - Merged yet more contributions from Eric, http://www.ypass.net
+ - Added usage instructions
+ - Added MPEG-2 video encoding
+ - GD features that may not be available on some platforms are only executed if 
+   available.
 
 v1.2 2009, 17th July.
  - Merged extensive contributions from Eric, http://www.ypass.net
