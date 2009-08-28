@@ -135,9 +135,7 @@ Known Limitations
 
  - The script must be provide a filename as a required argument.
  - The script can't be run in an automated fashion.
- - I've found a few bugs in my code:
-     1. if a cover image doesn't exist, it fails
-     2. if only 1 result is returned, it fails
+ - If only 1 result is returned, it fails.
 
 Source Code
 
@@ -154,14 +152,14 @@ References
  - http://projects.izzysoft.de/trac/imdbphp
 
 v2.0 2009, 28th August.
- - Merged yet more contributions from Eric, http://www.ypass.net
- - Added usage instructions
- - Added MPEG-2 video encoding
- - GD features that may not be available on some platforms are only executed if 
-   available.
+ - Merged yet more contributions from Eric, http://www.ypass.net. Thanks Eric!
+ - Added usage instructions.
+ - Added MPEG-2 video encoding.
+ - Fixed spiffy animations when cover art is not available.
+ - Fixed spiffy animations of platforms that may have incomplete GD.
 
 v1.2 2009, 17th July.
- - Merged extensive contributions from Eric, http://www.ypass.net
+ - Merged extensive contributions from Eric, http://www.ypass.net. Thanks Eric!
  - Updated the README to reflect Eric's changes.
  - Not publically released.
 

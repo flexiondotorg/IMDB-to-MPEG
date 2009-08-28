@@ -471,7 +471,7 @@ class IMDB_to_MPEG {
 	    /*
 	    * If we have a cover photo, fade it in, wait a the lenght, fade it out
 	    */
-	    if ($this->videoInfo['coverPhoto']) {
+	    if ($this->videoInfo['coverPhoto'] != null) {
 	        // first few frames should fade in the cover photo
 
 	        // First, make sure the image is true color
@@ -644,15 +644,20 @@ class IMDB_to_MPEG {
 
     	    debug("Arrived at $curX x $curY");
     	    debug("We're doing moving and resizing");
-	    }
-	    // $frame is set to the last frame in that sequence
+	    }// $frame is set to the last frame in that sequence
+	    else
+	    {
+	        // We didn't find any cover art so just make a frame.
+            $frame = imagecreatetruecolor($width, $height);	    	    	    
+	    }	    
 
 	    /*
 	    * Same for the text... fade it in, wait a the lenght, but DO NOT fade it out
 	    */
-	    // get ourselves the partial frame accounting for th cover image
-    	$subframeW = imagesx($frame) * 0.85 - 50;
-	    $subframeH = imagesy($frame);
+        // get ourselves the partial frame accounting for the cover image	    	    	    
+       	$subframeW = imagesx($frame) * 0.85 - 50;
+        $subframeH = imagesy($frame);
+	    	   
     	debug("We have $subframeW x $subframeH to do this thing....");
 	    $textsubframe = $this->createTextFrame($subframeW, $subframeH);
 
