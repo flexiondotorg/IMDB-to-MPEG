@@ -25,7 +25,7 @@ echo("IMDB-to-MPG v$VER - Uses IMDB to create a MPEG2 video summary of a film.\n
 echo("Copyright (c) 2009 Flexion.Org, http://flexion.org. GPLv2 License.\n");
 echo("\n");
 
-require('imdbphp-1.1.3/imdb.class.php');
+require('imdbphp-1.1.4/imdb.class.php');
 require('texttoimage-1.0/TextToImage.class.php');
 
 $video_format = "PAL";  // can also be "NTSC"
