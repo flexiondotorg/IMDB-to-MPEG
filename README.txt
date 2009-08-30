@@ -33,38 +33,50 @@ I run Mediatomb DLNA server with my PS3 as the client. I am working towards
 importing my entire DVD and Blu-Ray collection into my Mediatomb server. 
 However, my wife wants to know something about each film in the library without 
 having to dig out the DVD case from storage. My solution is to include a MPEG 
-video displaying the film summary in the Mediatomb library for each DVD I have 
-imported so it can be easily viewed from the PS3.
+video displaying the film summary in the Mediatomb library so it can be easily 
+viewed from the PS3.
 
 Usage
 
-  IMDB-to-MPEG.php -t "Move Title" -i 1234567 -o m4v -r 864x480 movie.mkv
+  IMDB-to-MPEG.php -f movie.mkv -t "Move Title" -i 1234567 -o m4v -r 864x480
 
-You can also pass several optional arguments
-  -a    : Automates execution by answering all prompts with the default response.
-  -t    : Provide a film title to search for.
-  -i    : Provide an IMDB ID to search for.
-  -o    : Set the MPEG output format: m4v (default), mp4, m2v or mpg.
-  -r    : Set the MPEG output resolution: 864x480 is the default.
-  -d    : Enable debug mode.
-  -h    : This help.
+The script accepts several arguments, one of -f, -t or -i are required.
+  -f : Provide a path to a filename of the film to search for.
+  -t : Provide a film title to search for.
+  -i : Provide an IMDB ID to search for.
+  -a : Automates execution by answering all prompts with the default response.
+  -o : Set the MPEG output format: m4v (default), mp4, m2v or mpg.
+  -r : Set the MPEG output resolution: 864x480 is the default.
+  -d : Enable debug mode.
+  -h : This help.
 
-This scripts requires at least one argument as input, the filename of a file. 
-By default the script will try to lookup the film based on the filename you
-provided. In addition you can provide some optional arguments to help find the 
-correct film. For example...
+This scripts requires at least one argument or either filename (-f), title (-t)
+or IMDB ID (-i). If you just supply the path to a file then the script will try 
+to lookup the film based on that filename. In addition you can provide some 
+optional arguments to help find the correct film. For example...
 
 Search by title by passing the optional title argument -t. If the film title has 
 spaces it should be wrapped in double quotes.
 
- ./IMDB-to-MPEG.php -t "Usual Suspects" ~/Videos/The_Usual_Suspects.mpg
+ ./IMDB-to-MPEG.php -f ~/Videos/The_Usual_Suspects.mpg -t "Usual Suspects" 
  
 Search by IMDB ID by passing the optional IMDB ID argument -i 
  
- ./IMDB-to-MPEG.php -i 0114814 ~/Videos/The_Usual_Suspects.mpg 
+ ./IMDB-to-MPEG.php -f ~/Videos/The_Usual_Suspects.mpg -i 0114814 
 
-The plotline, year of release, genres, cast list and running time for that film 
-are gathered from IMDB and formatted as text. You'll be prompted to confirm that
+If you just want to refresh or create a film summary without having a film file 
+you can omit the use of the filename argument (-f) and just use title (-t) or 
+IMDB ID (-i) arguments. For example:
+
+ ./IMDB-to-MPEG.php -t "Usual Suspects" 
+ 
+Or 
+ 
+ ./IMDB-to-MPEG.php -i 0114814  
+
+When you run the script with the required search criteria the covert art, 
+plotline, year of release, genres, cast list and running time for that film are 
+gathered from IMDB and formatted as text. You'll be prompted to confirm that 
 this is the film you are seeking. Here is an example.
 
 ---
@@ -88,10 +100,10 @@ Rated 8.7 out of 10 from 227,964 votes.
 Use this movie [Y/n]:
 
 The first IMDB entry that matches the search string will be used, which works 
-fine most of the time so long as the title string is accurate. Should the search 
-result not be the film you are looking for you can select an alternative from 
-the list provided. Once a film has been selected the text is converted into a
-series of image and then encoded into a MPEG video. 
+fine most of the time so long as the title string or IMDB ID are accurate. 
+Should the search result not be the film you are looking for you can select an 
+alternative from the list provided. Once a film has been selected the text is 
+converted into a series of images and then encoded into a MPEG video. 
 
 The default behaviour is to encode a MPEG-4 video at a resolution of 864x480.
 You can optionally encode the video as MPEG-2 video. For example:
@@ -128,12 +140,11 @@ You will end up with something like this.
 
 Requirements
 
- - ffmpeg, jpeg2yuv, php5-cli, php5-gd
+ - ffmpeg, php5-cli, php5-gd
  - A real OS such as Linux, FreeBSD, Solaris, maybe even Mac OS X, etc.
 
 Known Limitations
 
- - The script must be provide a filename as a required argument.
  - The script can't be run in an automated fashion.
  - If only 1 result is returned, it fails.
 
@@ -155,8 +166,11 @@ v2.0 2009, 28th August.
  - Merged yet more contributions from Eric, http://www.ypass.net. Thanks Eric!
  - Added usage instructions.
  - Added MPEG-2 video encoding.
+ - Improved video encoding speed by removing pre-processing with 'jpeg2yuv'.
  - Fixed spiffy animations when cover art is not available.
  - Fixed spiffy animations of platforms that may have incomplete GD.
+ - Modified filename input so that an input filename is optional rather than 
+   mandatory.
 
 v1.2 2009, 17th July.
  - Merged extensive contributions from Eric, http://www.ypass.net. Thanks Eric!
