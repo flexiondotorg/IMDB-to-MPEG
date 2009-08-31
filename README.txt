@@ -147,6 +147,7 @@ Known Limitations
 
  - The script can't be run in an automated fashion.
  - If only 1 result is returned, it fails.
+ - Doesn't index based on film certifcate/classification
 
 Source Code
 

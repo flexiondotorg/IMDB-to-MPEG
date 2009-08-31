@@ -32,12 +32,14 @@ define("FADE_TIME", "0.5");
 
 // the number of seconds to display the movie cover photo
 define("COVER_DISPLAY_TIME", "2");
-define("TEXT_DISPLAY_TIME", "15");
+define("TEXT_DISPLAY_TIME", "18");
 
 // change this to " " if you want spaces in your filenames
 define("FILENAME_WORD_SPACE_CHAR", "_");
 
-define("TEXT_FONTSIZE", "15");
+// set the font size
+define("TEXT_FONTSIZE", "18");
+
 $supported_output = array(
 	'm4v' => 'H.264 video and AAC audio',
 	'mp4' => 'H.264 video and AAC audio',
@@ -45,22 +47,26 @@ $supported_output = array(
 	'mpg' => 'MPEG-2 video and MPEG layer 2 audio',
 	);
 
+// Disable debug mode by default
+$debug = false;
+
+// Disable auto mode by default
+$auto = false;
+
 echo("IMDB-to-MPG v" . VERSION . " - Create a MPEG video summarising a movie using data from IMDB.\n");
 echo("Copyright (c) 2009 Flexion.Org, http://flexion.org. GPLv2 License.\n");
 echo("\n");
 
 require(dirname(__FILE__) . '/imdbphp-1.1.4/imdb.class.php');
 
-/*
- *  Give ourselves a debug output function
- */
-$debug = false;
+// Debug output function
 function debug($text) {
     if ($GLOBALS['debug']) {
     	echo "DEBUG: $text\n";
     }
 }
 
+// Usage information
 function usage() {
     echo ("Usage\n");
     echo ("  IMDB-to-MPEG.php -f movie.mkv -t \"Move Title\" -i 1234567 -o m4v -r 864x480\n");
@@ -76,10 +82,7 @@ function usage() {
     echo ("  -h : This help.\n");
 }
 
-/*
-*  Make sure we can function
-*/
-
+//  Make sure we can function
 // We can't do sym-links or /dev/null on Windows. 
 if (PHP_OS == 'WINNT') {
     echo("ERROR: Sorry, this script doesn't work on Windows\\nn");
@@ -92,16 +95,14 @@ if (substr(PHP_VERSION, 0 ,1) < '5') {
     exit(1);
 }
 
+// Have we got enough arguments?
 if ($argc == 1) {
     echo "ERROR: As a minimum requirement you must specifiy a filename, title or IMDB ID.\n\n";
     usage();
     exit(1);
 }
 
-/*
-* Parse Command Line Options
-*/
-
+// Parse Command Line Options
 // getopt is somewhat broken in php < 5.3.0, but let's try
 $longopts = array(
 	'title:',
@@ -109,14 +110,15 @@ $longopts = array(
 	'filename:',
 	'output-type:',
 	'resolution:',
+	'auto',
 	'debug',
 	'help',
 	);
 	
 if (version_compare(phpversion(), "5.3.0") >= 0) {
-    $optlist = getopt("dt:i:f:o:r:h:", $longopts);
+    $optlist = getopt("dat:i:f:o:r:h:", $longopts);
 } else {
-    $optlist = getopt("dt:i:f:o:r:h:");
+    $optlist = getopt("dat:i:f:o:r:h:");
 }
 
 foreach ($optlist as $optind => $optarg) {
@@ -126,6 +128,11 @@ foreach ($optlist as $optind => $optarg) {
 	    $debug = true;
 	    debug("WARNING: Debugging enabled.... STAND BACK!\n");
 	    break;
+	case 'auto':
+	case 'a':
+	    $auto = true;
+	    debug("Automatic mode enabled\n");
+	    break;	    
 	case 'title':
 	case 't':
 	    $options['title'] = $optarg;
@@ -163,10 +170,7 @@ foreach ($optlist as $optind => $optarg) {
     }
 }
 
-/*
- * Perform some default configuration and create a sane environment
- */
-
+// Have we got the essential arguments?
 if ( !isset($options['filename']) && !isset($options['title']) && !isset($options['id'])) {
     echo "ERROR: As a minimum requirement you must specifiy a filename, title or IMDB ID.\n\n";
     usage();
@@ -198,11 +202,11 @@ if (! isset($options['id'])) {
     }
 }
 
+// Check the output type is valid
 if (! isset($options['output_type'])) {
     $options['output_type'] = DEFAULT_OUTPUT_TYPE;
 }
 
-// make sure we know what we're supposed to be spitting out
 if (! array_key_exists($options['output_type'], $supported_output)) {
     echo "ERROR: Unsupported output type : '" . $options['output_type'] . "' Supported types are:\n";
     
@@ -213,11 +217,11 @@ if (! array_key_exists($options['output_type'], $supported_output)) {
     exit(1);
 }
 
+// Check that the output resolution is valid
 if (! isset($options['resolution'])) {
     $options['resolution'] = DEFAULT_RESOLUTION;
 }
 
-// parse the resolution option to width and height
 if (! preg_match('/^(\d+)x(\d+)$/', $options['resolution'], $regs)) {
     echo "ERROR: '$options[resolution]' does not appear to be a resultion.  Use format of: 424x240\n\n";
     usage();
@@ -341,19 +345,26 @@ class IMDB_to_MPEG {
 	    }
     }
 
+    public function underline($wraplen = 75) {
+    
+        $underline = "\n";
+        
+        for ($loop = 0; $loop < $wraplen; $loop++) {
+	        $underline .= "-";
+	    }    
+	    return $underline . "\n";
+	}
+
     public function displayMovie($wraplen = 75) {
-	    $this->setVideoInfo();
+	    $this->setVideoInfo();    	
+    	
+	    echo $this->underline($wraplen);
 	    echo $this->getVideoText($wraplen);
+	    echo $this->underline($wraplen);
     }
 
     public function getVideoText($wraplen) {
-    	$text = $this->videoInfo['title'] . " (" . $this->videoInfo['year'] . ")\n";
-    	
-    	// Sorry Eric, I don't like this dotted line.
-    	/*for ($ctr = 0; $ctr < $wraplen; $ctr++) {
-	        $text .= "-";
-	    }*/
-	
+    	$text = $this->videoInfo['title'] . " (" . $this->videoInfo['year'] . ")\n";    		
 	    $text .= "\n";
 	    
 	    if (strlen($this->videoInfo['tagline'])) {
@@ -382,12 +393,14 @@ class IMDB_to_MPEG {
     }
 
     public function listResults() {
-    	echo "Search Results:\n";
-	    echo "IMDB ID    Movie Title\n";
-	    echo "--------------------------------------------------------------------------\n";
+      	echo "\nDisplaying : All matches";    	
+	    echo $this->underline(75);
+	    echo "IMDB ID    Movie Title";
+	    echo $this->underline(75);        
 	    foreach ($this->searchResults as $index => $result) {
 	        printf("%-8.8s   %s (%4s)\n", $result->imdbID(), str_cleaner($result->title()), $result->year());
 	    }
+	    echo $this->underline(75);
     }
 
     static public function validId($id) {
@@ -470,7 +483,7 @@ class IMDB_to_MPEG {
 
 	    // delete anything in there
 	    if (! $d = opendir($basedir)) {
-	        echo "ERROR: Could not open: $basedir\n\n";
+	        echo "ERROR: Could not open temp directory: $basedir\n\n";
 	        exit(1);
 	    }
 
@@ -717,36 +730,39 @@ class IMDB_to_MPEG {
 	    return($basedir);
     }
 
-    public function encodeVideoM4V($frameRate, $frameDir) {
-	    $this->infoMovieFile = $outputFileName = "About" . FILENAME_WORD_SPACE_CHAR . $this->videoInfo['cleanTitle'] . '.mp4';
-
-	    #$cmd = 'jpeg2yuv -v 0 -j "' . $frameDir . '/frame_%04d.jpg" -f ' . $frameRate . ' -I p | ffmpeg -y -i - -vcodec libx264 -b 50k -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '"'; 
-        $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -vcodec libx264 -b 50k -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '"'; 
+    public function makeMPEG($frameRate, $frameDir, $videoFormat = "MPEG-4") {
+	    $this->infoMovieFile = $outputFileName = "About" . FILENAME_WORD_SPACE_CHAR . $this->videoInfo['cleanTitle'];  
+    
+        //Remove any previous summary clips.
+        if (file_exists('All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg')) {        
+            unlink('All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg');
+        }                   
+        if (file_exists('All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4')) {                                    
+            unlink('All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4');               
+        }             
+	    
+	    // Default to MPEG-4 is the passed videoFormat is invalid
+        if ($videoFormat != "MPEG-2" || $videoFormat != "MPEG-4") {
+            $videoFormat = "MPEG-4";
+        }
+	    
+	    // Make the appropriate video clip
+        if ($videoFormat = "MPEG-4") {
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -vcodec libx264 -b 50k -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4"'; 
+        } elseif ($videoFormat = "MPEG-2") {
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -vcodec mpeg2video -b 640000 -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg"';         
+        }
+                
 	    if ($GLOBALS['debug']) {
 	        echo "Running: $cmd" . "\n";
 	        `$cmd`;
     	} else {
-	        echo "Encoding Info Movie File...";
+	        echo "Encoding video frames...";
 	        `$cmd > /dev/null 2>&1`;
 	        echo " done\n";
 	    }
     }
-    
-    public function encodeVideoM2V($frameRate, $frameDir) {
-	    $this->infoMovieFile = $outputFileName = "About" . FILENAME_WORD_SPACE_CHAR . $this->videoInfo['cleanTitle'] . '.mpg';
-
-	    #$cmd = 'jpeg2yuv -v 0 -j "' . $frameDir . '/frame_%04d.jpg" -f ' . $frameRate . ' -I p | ffmpeg -y -i - -vcodec mpeg2video -b 640000 -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '"'; 
-        $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -vcodec mpeg2video -b 640000 -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '"'; 	    
-	    if ($GLOBALS['debug']) {
-	        echo "Running: $cmd" . "\n";
-	        `$cmd`;
-    	} else {
-	        echo "Encoding Info Movie File...";
-	        `$cmd > /dev/null 2>&1`;
-	        echo " done\n";
-	    }
-    }    
-
+  
     public function encodeVideo() {
 	    // maybe these should be dynamic?
 	    $frameRate = 30;
@@ -756,29 +772,30 @@ class IMDB_to_MPEG {
 	    switch ($this->output_type) {
 	        case 'm4v':
 	        case 'mp4':
-		        $this->encodeVideoM4V($frameRate, $framedir);
+		        $this->makeMPEG($frameRate, $framedir, 'MPEG-4');
 		        break;
 		    case 'm2v':
 		    case 'mpg':		        		        
-		        $this->encodeVideoM2V($frameRate, $framedir);
+		        $this->makeMPEG($frameRate, $framedir, 'MPEG-2');
 		        break;		    
 	    }
     }
 
     public function createSymLinkTree() {
+        echo("Categorising...\n");
 	    if (!empty($this->videoInfo['genres'])) {
 	        @mkdir('All/' . $this->videoInfo['cleanTitle'], 0777, true);
 	        @touch('All/' . $this->videoInfo['cleanTitle'] . "/.imdbid_" . $this->imdbMovie->imdbID(), 0777, true);
 	        for ($i = 0; $i < count($this->videoInfo['genres']); $i++)
 	        {
-	        	echo "Adding this movie into Genres/" . str_cleaner($this->videoInfo['genres'][$i]) . "...\n";
+	        	echo " - Adding to Genres/" . str_cleaner($this->videoInfo['genres'][$i]) . "\n";
 	        	@mkdir('Genres/' . str_cleaner($this->videoInfo['genres'][$i]), 0777, true);
 	        	@symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Genres/' . str_cleaner($this->videoInfo['genres'][$i]) . '/' . $this->videoInfo['cleanTitle']);
 	        }
 	    }
 	    
 	    if (!empty($this->videoInfo['rating'])) {
-	        echo "Adding this movie into Ratings/" . (int)$this->videoInfo['rating'] . "...\n";
+	        echo " - Adding to Ratings/" . (int)$this->videoInfo['rating'] . "\n";
 	        @mkdir('Ratings/' . (int)$this->videoInfo['rating'], 0777, true);
 	        @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Ratings/' . (int)$this->videoInfo['rating'] . '/' . $this->videoInfo['cleanTitle']);
     	}
@@ -800,71 +817,67 @@ function str_cleaner($string_in, $strip_double_quotes = false)
 
 $i2m = new IMDB_to_MPEG($options);
 
-/*
- * Step 1: Get the user to identify the movie
- */
+// Get the user to identify the movie. If auto mode is enable use the first hit.
 do {
-    echo "Searching IMDB for: " . $i2m->title . "\n";
+    echo "Searching for: \"" . $i2m->title . "\"\n";
     $i2m->search();
     
+    // If an IMDB ID was supplied the audo mode is assumed
     if ($i2m->imdbMovie && $i2m->imdbMovie->imdbID == $options['id']) {
-	    echo "Found " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n";
+	    echo "Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n";
     	$i2m->displayMovie();
 	    break;
     } else {
-	    echo "Found " . count($i2m->searchResults) . " possible matches\n";
-    	echo "Displaying first result:\n\n";
-	    $i2m->displayMovie();
-	    echo "\n\n";
-    	$yn = readline("Use this movie [Y/n]: ");
-	    if (strtolower($yn) == "y" || $yn == '') {
+	    echo "Found : " . count($i2m->searchResults) . " possible matches\n";
+	    
+	    // If auto mode is enabled use the first hit
+	    if ($auto) {
+            $i2m->displayMovie();        	
 	        $i2m->imdbMovie = $i2m->searchResults[1];
-	        break;
-	    } else {
-	        $i2m->listResults();
-	        echo "\n";
-	        $id = null;
-	        while (! $i2m->validId($id)) {
-	        	$id = readline("Enter an IMDB ID for this movie: ");
-	        }
-	        $i2m->getMovieById($id);
-    	    echo "\n";
+	        break;        	
+	    } else {	    
+        	echo "Displaying : First match";
 	        $i2m->displayMovie();
-	        echo "\n\n";
-	        $yn = readline("Use this movie [Y/n]: ");
+        	$yn = readline("Use this movie [Y/n]: ");
 	        if (strtolower($yn) == "y" || $yn == '') {
-        		$i2m->imdbMovie = $i2m->searchResults[1];
-		        break;
-    	    }
-	        $i2m->id = null;
-	    }
+	            $i2m->imdbMovie = $i2m->searchResults[1];
+	            break;
+	        } else {
+	            $i2m->listResults();	    
+	            $id = null;
+	            while (! $i2m->validId($id)) {
+	            	$id = readline("Enter an IMDB ID for this movie: ");
+	            }
+	            $i2m->getMovieById($id);
+        	    echo "Displaying : $id";	            
+	            $i2m->displayMovie();
+	            $yn = readline("Use this movie [Y/n]: ");
+	            if (strtolower($yn) == "y" || $yn == '') {
+            		$i2m->imdbMovie = $i2m->searchResults[1];
+	    	        break;
+        	    }
+	            $i2m->id = null;
+	        }
+        }
     }
 } while (true);
 
-/*
- * Step 2: Create our symlinks
- */
+// Create the symlinks
 $i2m->createSymLinkTree();
 
-/*
- * Step 3: Make a our video
- */
+// Make a our video synopsis clip
 $i2m->encodeVideo();
 
-/*
- * Step 4: Move our video file?
- */
+// If we specified a video file move it to the movie store
 if ( isset($options['filename']) ) { 
-    echo "--------------------------------------------------------------------------\n";
-    echo "Would you like to move the actual movie into the directory as well?\n\n";
-    echo "Source File: " . $i2m->filename . "\n";
-    echo "Destination: " . 'All/' . $i2m->videoInfo['cleanTitle'] . "/\n\n";
-
-    $yn = readline("Move this file? [y/N]: ");
-    if (strtolower($yn) == "y") {
-        $cmd = 'mv "' . $i2m->filename . '" "All/' . $i2m->videoInfo['cleanTitle'] . "/" . basename($i2m->filename) . '"';
-        `$cmd`;    
-        ##rename("/tmp/tmp_file.txt", "/home/user/login/docs/my_file.txt");
-    }
+    debug("Moving the movie: " . $i2m->filename . " to All/" . $i2m->videoInfo['cleanTitle'] . "/");
+    echo "Moving the movie: " . $i2m->filename . " to All/" . $i2m->videoInfo['cleanTitle'] . "/\n\n";
+    
+    //Work around a possible rename bug   
+    $cmd = 'mv "' . $i2m->filename . '" "All/' . $i2m->videoInfo['cleanTitle'] . "/" . basename($i2m->filename) . '"';
+    `$cmd`;    
+    ##rename("/tmp/tmp_file.txt", "/home/user/login/docs/my_file.txt"); 
 }
+
+echo("All Done!\n");
 exit(0);

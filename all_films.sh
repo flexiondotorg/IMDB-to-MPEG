@@ -1,4 +1,28 @@
 #!/bin/bash
+
+IFS=$'\n'
+
+# Get a list of films
+FILMS=`ls -1 ~/Videos/Films/All/`
+
+# Change to the root of my movie store
+cd ~/Videos/Films
+
+# Delete the existing Generes and Rating. They might have changed.
+rm -rf Ratings
+rm -rf Genres
+
+# Loop through the films and create the IMDB summary
+for FILM in ${FILMS}
+do
+    FILM_TITLE=`echo ${FILM} | sed s'/_/ /g'`
+    #echo ${FILM_TITLE}    
+    php ~/Source/IMDB-to-MPEG/IMDB-to-MPEG.php -t "${FILM_TITLE}" -a
+done
+
+exit
+
+#The old stuff
 php IMDB-to-MPEG.php "Austin Powers International Man of Mystery"
 php IMDB-to-MPEG.php "Austin Powers The Spy Who Shagged Me"
 php IMDB-to-MPEG.php "Austin Powers in Goldmember"
