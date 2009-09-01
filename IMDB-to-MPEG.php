@@ -825,7 +825,7 @@ if (isset($i2m->id)) {
     
     // Make sure we found something
     if ($i2m->imdbMovie->title()) {
-        echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n");
+        echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")");
     	$i2m->displayMovie();    
     } else {
         echo("ERROR: No matching film found for IMDB ID : $i2m->id\n");
@@ -844,7 +844,7 @@ if (isset($i2m->id)) {
         exit(1);
     }                
 
-    echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n");        
+    echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")");        
     $i2m->displayMovie();        	
 
     // If auto mode is enabled use the first hit
@@ -865,12 +865,13 @@ if (isset($i2m->id)) {
                     $id = readline("Enter an IMDB ID for this movie: ");
                 }
                 $i2m->getMovieById($id);
-                echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n");                
+                echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")");                
                 $i2m->displayMovie();
             }        
         } while (true);
     }    
 }
+
 // Create the symlinks
 $i2m->createSymLinkTree();
 
@@ -879,13 +880,9 @@ $i2m->encodeVideo();
 
 // If we specified a video file move it to the movie store
 if ( isset($options['filename']) ) { 
-    debug("Moving the movie: " . $i2m->filename . " to All/" . $i2m->videoInfo['cleanTitle'] . "/");
-    echo "Moving the movie: " . $i2m->filename . " to All/" . $i2m->videoInfo['cleanTitle'] . "/\n\n";
-    
-    //Work around a possible rename bug   
-    $cmd = 'mv "' . $i2m->filename . '" "All/' . $i2m->videoInfo['cleanTitle'] . "/" . basename($i2m->filename) . '"';
-    `$cmd`;    
-    ##rename("/tmp/tmp_file.txt", "/home/user/login/docs/my_file.txt"); 
+    debug("Moving " . $i2m->filename . " to All/" . $i2m->videoInfo['cleanTitle'] . "/");
+    echo "Moving " . $i2m->filename . " to All/" . $i2m->videoInfo['cleanTitle'] . "/\n";    
+    rename($i2m->filename, 'All/' . $i2m->videoInfo['cleanTitle'] . '/' . basename($i2m->filename)); 
 }
 
 echo("All Done!\n");
