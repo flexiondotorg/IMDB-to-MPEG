@@ -141,13 +141,13 @@ You will end up with something like this.
 Requirements
 
  - ffmpeg, php5-cli, php5-gd
- - A real OS such as Linux, FreeBSD, Solaris, maybe even Mac OS X, etc.
+ - An OS such as Linux, FreeBSD, Solaris, Mac OS X is required for 
+   categorisation to work
 
 Known Limitations
 
- - The script can't be run in an automated fashion.
- - If only 1 result is returned, it fails.
- - Doesn't index based on film certifcate/classification
+ - Categorisation doen't work on Windows as it doesn't have sym-link capability.
+ - Categorisation doen't work on FAT32 file systems.
 
 Source Code
 

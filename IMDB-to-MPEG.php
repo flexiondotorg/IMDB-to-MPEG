@@ -189,6 +189,8 @@ if ( !isset($options['title']) && isset($options['filename']) ) {
     $title = preg_replace('/^(.*)\..*$/', '$1', $title);
     $title = str_replace("_", " ", $title);
     $options['title'] = $title;
+} elseif (!isset($options['title'])) {
+    $options['title'] = '';
 }
 
 if (! isset($options['id'])) {
@@ -260,16 +262,17 @@ class IMDB_to_MPEG {
 
     public function __construct($options)
     {
-	    $this->id = $options['id'];
-	    $this->title = $options['title'];
-    	$this->output_type = $options['output_type'];
-	    $this->resolution = $options['resolution'];
+	    $this->id = $options['id'];	    
+        $this->title = $options['title'];
     	
     	if ( isset($options['filename']) ) {
         	$this->filename = $options['filename'];
         } else {
             $this->filename = '';        
         }        	
+        
+        $this->output_type = $options['output_type'];
+	    $this->resolution = $options['resolution'];        
         
 	    $this->fadetime = FADE_TIME;
     	$this->coverDisplayTime = COVER_DISPLAY_TIME;
@@ -315,6 +318,7 @@ class IMDB_to_MPEG {
     	$this->videoInfo['rating']      = $this->imdbMovie->rating();
 	    $this->videoInfo['votes']       = $this->imdbMovie->votes();
     	$this->videoInfo['coverPhotoURL'] = $this->imdbMovie->photo(false);
+    	
     	if (is_array($this->imdbMovie->mpaa())) {    
     	    $certificate_array = $this->imdbMovie->mpaa();
         	$this->videoInfo['certificate'] = $certificate_array[COUNTRY];    	   	
@@ -324,36 +328,7 @@ class IMDB_to_MPEG {
     	    echo "ERROR: Classification not found\n";
     	    exit(1);
     	}
-/*    	
-    	print_r($this->videoInfo['mpaa']);
-Displaying : First matchArray
-(
-    [Ireland] => 15A
-    [UK] => 15
-    [USA] => R
-    [Portugal] => M/16
-    [Canada] => 14A
-    [Finland] => K-15
-    [Norway] => 15
-    [Malaysia] => 18PL
-    [Singapore] => M18
-    [Germany] => 12
-    [Brazil] => 16
-    [Philippines] => R-13
-    [Switzerland] => 14
-    [Australia] => MA
-    [Netherlands] => 16
-    [New Zealand] => R16
-    [South Korea] => 15
-    [Argentina] => 13
-    [Japan] => PG-12
-    [Denmark] => 11
-    [Austria] => 16
-    [South Africa] => 16LV
-    [Iceland] => 16
-    [Mexico] => B15
-)    	
-*/    	
+    	
 	    $cleanTitle = str_replace(' ', FILENAME_WORD_SPACE_CHAR, $this->videoInfo['title']);
     	$cleanTitle = str_replace('&', 'and', $cleanTitle);
 	    $cleanTitle = str_replace(array("'"), '', $cleanTitle);
@@ -681,22 +656,7 @@ Displaying : First matchArray
 	        debug("Moving from $curX x $curY to $moveToX x $moveToY in $stepX x $stepY increments over $fadeframes frames");
 	        for ($ctr = 0; $ctr < $fadeframes; $ctr++) {
     	    	$newframe = imagecreatetruecolor($width, $height);
-	
-    	    	// stick a dim version halfway between the steps.. we need to
-	        	// create some motion blur so it doesn't look as choppy.  but
-	        	// not on the first and last frames....
-	    	    /*
-	    	    //ok... this didn't work.....
-	    	    if ($ctr >= 1 && $ctr != $fadeframes-1) {
-	    	        imagecopyresampled($newframe, $coverPhoto, $curX - $stepX/2, $curY - $stepY/2, 0, 0, $curW, $curH, $cX, $cY);
-        		    imagefilter($newframe, IMG_FILTER_BRIGHTNESS, -224);
-	        	    imagecopyresampled($newframe, $coverPhoto, $curX - $stepX/3, $curY - $stepY/3, 0, 0, $curW, $curH, $cX, $cY);
-	        	    imagefilter($newframe, IMG_FILTER_BRIGHTNESS, -192);
-	        	    imagecopyresampled($newframe, $coverPhoto, $curX - $stepX/4, $curY - $stepY/4, 0, 0, $curW, $curH, $cX, $cY);
-	        	    imagefilter($newframe, IMG_FILTER_BRIGHTNESS, -128);
-	        	}
-	        	*/
-		
+			
     		    $curX -= $stepX;
 	    	    $curY -= $stepY;
         		$curW -= $stepWidth;
@@ -775,7 +735,7 @@ Displaying : First matchArray
     public function makeMPEG($frameRate, $frameDir, $videoFormat = "MPEG-4") {
 	    $this->infoMovieFile = $outputFileName = "About" . FILENAME_WORD_SPACE_CHAR . $this->videoInfo['cleanTitle'];  
     
-        //Remove any previous summary clips.
+        //Remove any previous, and possible old, summary clips.
         if (file_exists('All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg')) {        
             unlink('All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg');
         }                   
@@ -859,51 +819,58 @@ function str_cleaner($string_in, $strip_double_quotes = false)
 
 $i2m = new IMDB_to_MPEG($options);
 
-// Get the user to identify the movie. If auto mode is enable use the first hit.
-do {
-    echo "Searching for: \"" . $i2m->title . "\"\n";
-    $i2m->search();
+// If searching by IMDB ID just go a fetch the appropriate movie.
+if (isset($i2m->id)) {
+    $i2m->getMovieById($i2m->id);
     
-    // If an IMDB ID was supplied the audo mode is assumed
-    if ($i2m->imdbMovie && $i2m->imdbMovie->imdbID == $options['id']) {
-	    echo "Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n";
-    	$i2m->displayMovie();
-	    break;
+    // Make sure we found something
+    if ($i2m->imdbMovie->title()) {
+        echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n");
+    	$i2m->displayMovie();    
     } else {
-	    echo "Found : " . count($i2m->searchResults) . " possible matches\n";
-	    
-	    // If auto mode is enabled use the first hit
-	    if ($auto) {
-            $i2m->displayMovie();        	
-	        $i2m->imdbMovie = $i2m->searchResults[1];
-	        break;        	
-	    } else {	    
-        	echo "Displaying : First match";
-	        $i2m->displayMovie();
-        	$yn = readline("Use this movie [Y/n]: ");
-	        if (strtolower($yn) == "y" || $yn == '') {
-	            $i2m->imdbMovie = $i2m->searchResults[1];
-	            break;
-	        } else {
-	            $i2m->listResults();	    
-	            $id = null;
-	            while (! $i2m->validId($id)) {
-	            	$id = readline("Enter an IMDB ID for this movie: ");
-	            }
-	            $i2m->getMovieById($id);
-        	    echo "Displaying : $id";	            
-	            $i2m->displayMovie();
-	            $yn = readline("Use this movie [Y/n]: ");
-	            if (strtolower($yn) == "y" || $yn == '') {
-            		$i2m->imdbMovie = $i2m->searchResults[1];
-	    	        break;
-        	    }
-	            $i2m->id = null;
-	        }
-        }
+        echo("ERROR: No matching film found for IMDB ID : $i2m->id\n");
+        exit(1);
     }
-} while (true);
+} else {    
+    // We must be search by title if we get here
+    echo "Searching for \"" . $i2m->title . "\"";
+    $i2m->search();            
+        
+    // Make sure we found something
+    if (count($i2m->searchResults)) {
+        echo " : " . count($i2m->searchResults) . " possible matches.\n";        
+    } else {
+        echo("ERROR: No matching film found for title : $i2m->title\n");
+        exit(1);
+    }                
 
+    echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n");        
+    $i2m->displayMovie();        	
+
+    // If auto mode is enabled use the first hit
+    if ($auto) {
+        $i2m->imdbMovie = $i2m->searchResults[1];
+    } else {	        
+        // Ask the user to confirm/identify the movie. Loop until happy :-)
+        do 
+        {	    
+            $yn = readline("Use this movie [Y/n]: ");
+            if (strtolower($yn) == "y" || $yn == '') {
+                $i2m->imdbMovie = $i2m->searchResults[1];
+                break;
+            } else {
+                $i2m->listResults();	    
+                $id = null;
+                while (! $i2m->validId($id)) {
+                    $id = readline("Enter an IMDB ID for this movie: ");
+                }
+                $i2m->getMovieById($id);
+                echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")\n\n");                
+                $i2m->displayMovie();
+            }        
+        } while (true);
+    }    
+}
 // Create the symlinks
 $i2m->createSymLinkTree();
 
