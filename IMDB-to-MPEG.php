@@ -24,21 +24,9 @@ vim: sw=4 sts=4 cindent
 */
 
 define("VERSION", "2.0");
-define("DEFAULT_OUTPUT_TYPE", "m4v");
-define("DEFAULT_RESOLUTION", "864x480");
-
-// the number of seconds a fade in/out should take
-define("FADE_TIME", "0.5");
-
-// the number of seconds to display the movie cover photo
-define("COVER_DISPLAY_TIME", "2");
-define("TEXT_DISPLAY_TIME", "18");
 
 // change this to " " if you want spaces in your filenames
 define("FILENAME_WORD_SPACE_CHAR", "_");
-
-// set the font size
-define("TEXT_FONTSIZE", "18");
 
 $supported_output = array(
     'm4v' => 'H.264 video and AAC audio',
@@ -69,7 +57,7 @@ function debug($text) {
 // Usage information
 function usage() {
     echo ("Usage\n");
-    echo ("  IMDB-to-MPEG.php -f movie.mkv -t \"Move Title\" -i 1234567 -o m4v -r 864x480\n");
+    echo ("  IMDB-to-MPEG.php -f movie.mkv -t \"Move Title\" -i 1234567 -o m4v -r 864x480 -c UK\n");
     echo ("\n");
     echo ("The script accepts several arguments. One of -f, -t or -i are required.\n");
     echo ("  -f : Provide a path to a filename of the film. The move to search for\n");
@@ -78,11 +66,11 @@ function usage() {
     echo ("  -t : Provide a film title to search for.\n");
     echo ("  -i : Provide an IMDB ID to search for. Providing an IMDB ID will override\n");
     echo ("       the title, if supplied, or a title derived from a filename\n");    
-    echo ("  -a : Automates execution by answering all prompts with the default response.\n");    
+    echo ("  -a : Automates execution by accepting the first search result.\n");    
     echo ("  -c : Set the country you want to use for getting the movie certificate.\n");
     echo ("       For example: Australia, Canada, Germany, UK, USA, etc.\n");                
     echo ("  -o : Set the MPEG output format, one of 'm4v', 'mp4', 'm2v' or 'mpg'.\n");
-    echo ("  -r : Set the MPEG output resolution in  the format 123x456.\n");        
+    echo ("  -r : Set the MPEG output resolution in the format 852x480.\n");        
     echo ("  -d : Enable debug mode.\n");    
     echo ("  -h : This help.\n");
 }
@@ -216,7 +204,7 @@ if (! isset($options['id'])) {
 
 // Check the output type is valid
 if (! isset($options['output_type'])) {
-    $options['output_type'] = DEFAULT_OUTPUT_TYPE;
+    $options['output_type'] = 'mp4';
 }
 
 if (! array_key_exists($options['output_type'], $supported_output)) {
@@ -231,7 +219,7 @@ if (! array_key_exists($options['output_type'], $supported_output)) {
 
 // Check that the output resolution is valid
 if (! isset($options['resolution'])) {
-    $options['resolution'] = DEFAULT_RESOLUTION;
+    $options['resolution'] = '852x480';
 }
 
 if (! preg_match('/^(\d+)x(\d+)$/', $options['resolution'], $regs)) {
@@ -286,9 +274,7 @@ class IMDB_to_MPEG {
         $this->output_type = $options['output_type'];
         $this->resolution = $options['resolution'];        
         
-        $this->fadetime = FADE_TIME;
-        $this->coverDisplayTime = COVER_DISPLAY_TIME;
-        $this->textDisplayTime = TEXT_DISPLAY_TIME;
+        $this->fadetime = 0.5;
     }
 
     public function search()
@@ -478,11 +464,18 @@ class IMDB_to_MPEG {
     }
 
     public function getCoverPhoto() {
+        echo("Downloading covert art...");
         if (! ($img = @file_get_contents($this->videoInfo['coverPhotoURL']))) {
             $this->videoInfo['coverPhoto'] = null;
+            $this->coverDisplayTime = 0;
+            $this->textDisplayTime = 19;                    
+            echo(" not found\n");
             return;
         }
         $this->videoInfo['coverPhoto'] = $img;
+        $this->coverDisplayTime = 2;
+        $this->textDisplayTime = 17;        
+        echo(" done\n");
         return;
     }
 
@@ -518,7 +511,7 @@ class IMDB_to_MPEG {
         return $basedir;
     }
 
-    public function buildVideoFrames($frameRate = 30) {
+    public function buildVideoFrames($frameRate = 24) {
         
         // Prepare the tempory directory where the frame will be created.
         $basedir = $this->prepareTemp();    
@@ -784,7 +777,7 @@ class IMDB_to_MPEG {
   
     public function encodeVideo() {
         // maybe these should be dynamic?
-        $frameRate = 30;
+        $frameRate = 24;
 
         $this->getCoverPhoto();
         $framedir = $this->buildVideoFrames($frameRate);
@@ -807,22 +800,22 @@ class IMDB_to_MPEG {
             @touch('All/' . $this->videoInfo['cleanTitle'] . "/.imdbid_" . $this->imdbMovie->imdbID(), 0777, true);
             for ($i = 0; $i < count($this->videoInfo['genres']); $i++)
             {
-                echo " - Adding to Genres/" . str_cleaner($this->videoInfo['genres'][$i]) . "\n";
-                @mkdir('Genres/' . str_cleaner($this->videoInfo['genres'][$i]), 0777, true);
-                @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Genres/' . str_cleaner($this->videoInfo['genres'][$i]) . '/' . $this->videoInfo['cleanTitle']);
+                echo " - Adding to Genre/" . str_cleaner($this->videoInfo['genres'][$i]) . "\n";
+                @mkdir('Genre/' . str_cleaner($this->videoInfo['genres'][$i]), 0777, true);
+                @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Genre/' . str_cleaner($this->videoInfo['genres'][$i]) . '/' . $this->videoInfo['cleanTitle']);
             }
         }
         
         if (!empty($this->videoInfo['rating'])) {
-            echo " - Adding to Ratings/" . (int)$this->videoInfo['rating'] . "\n";
-            @mkdir('Ratings/' . (int)$this->videoInfo['rating'], 0777, true);
-            @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Ratings/' . (int)$this->videoInfo['rating'] . '/' . $this->videoInfo['cleanTitle']);
+            echo " - Adding to Rating/" . (int)$this->videoInfo['rating'] . "\n";
+            @mkdir('Rating/' . (int)$this->videoInfo['rating'], 0777, true);
+            @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Rating/' . (int)$this->videoInfo['rating'] . '/' . $this->videoInfo['cleanTitle']);
         }
         
         if (!empty($this->videoInfo['certificate'])) {
-            echo " - Adding to Certificates/" . $this->videoInfo['certificate'] . "\n";
-            @mkdir('Certificates/' . $this->videoInfo['certificate'], 0777, true);
-            @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Certificates/' . $this->videoInfo['certificate'] . '/' . $this->videoInfo['cleanTitle']);
+            echo " - Adding to Certificate/" . $this->videoInfo['certificate'] . "\n";
+            @mkdir('Certificate/' . $this->videoInfo['certificate'], 0777, true);
+            @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Certificate/' . $this->videoInfo['certificate'] . '/' . $this->videoInfo['cleanTitle']);
         }    
     }
 }
