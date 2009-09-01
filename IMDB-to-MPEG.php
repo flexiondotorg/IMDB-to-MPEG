@@ -852,12 +852,13 @@ if (isset($i2m->id)) {
         $i2m->imdbMovie = $i2m->searchResults[1];
     } else {	        
         // Ask the user to confirm/identify the movie. Loop until happy :-)
+        $movie_selected = False;
         do 
         {	    
             $yn = readline("Use this movie [Y/n]: ");
             if (strtolower($yn) == "y" || $yn == '') {
                 $i2m->imdbMovie = $i2m->searchResults[1];
-                break;
+                $movie_selected = True;
             } else {
                 $i2m->listResults();	    
                 $id = null;
@@ -868,7 +869,7 @@ if (isset($i2m->id)) {
                 echo("Found : " . str_cleaner($i2m->imdbMovie->title()) . " (" . str_cleaner($i2m->imdbMovie->year()) . ")");                
                 $i2m->displayMovie();
             }        
-        } while (true);
+        } while (! $movie_selected);
     }    
 }
 
