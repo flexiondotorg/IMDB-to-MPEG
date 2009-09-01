@@ -70,7 +70,13 @@ function usage() {
     echo ("  -c : Set the country you want to use for getting the movie certificate.\n");
     echo ("       For example: Australia, Canada, Germany, UK, USA, etc.\n");                
     echo ("  -o : Set the MPEG output format, one of 'm4v', 'mp4', 'm2v' or 'mpg'.\n");
-    echo ("  -r : Set the MPEG output resolution in the format 852x480.\n");        
+    echo ("  -r : Set the MPEG output resolution in the format 852x480. Examples:\n");        
+    echo ("       Resolution  Aspect ratio\n");
+    echo ("       720x480     4:3\n");
+    echo ("       852x480     16:9\n");
+    echo ("       1280x720    16:9\n");
+    echo ("       1365x768    16:9\n");
+    echo ("       1920x1080   16:9\n");
     echo ("  -d : Enable debug mode.\n");    
     echo ("  -h : This help.\n");
 }

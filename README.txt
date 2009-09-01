@@ -51,7 +51,13 @@ The script accepts several arguments. One of -f, -t or -i are required.
   -c : Set the country you want to use for getting the movie certificate.
        For example: Australia, Canada, Germany, UK, USA, etc.
   -o : Set the MPEG output format, one of 'm4v', 'mp4', 'm2v' or 'mpg'.
-  -r : Set the MPEG output resolution in the format 852x480.
+  -r : Set the MPEG output resolution in the format 852x480. Examples:
+       Resolution  Aspect ratio
+       720x480     4:3
+       852x480     16:9
+       1280x720    16:9
+       1365x768    16:9
+       1920x1080   16:9
   -d : Enable debug mode.
   -h : This help.
 
