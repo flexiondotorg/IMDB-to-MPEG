@@ -2,22 +2,38 @@
 
 IFS=$'\n'
 
-# Get a list of films
-FILMS=`ls -1 ~/Videos/Films/All/`
+FILM_STORE="${HOME}/Videos/Films"
+
+# Get a list of All films
+FILMS=`ls -1 ${FILM_STORE}/All/`
 
 # Change to the root of my movie store
-cd ~/Videos/Films
+cd ${FILM_STORE}
 
 # Delete the existing Generes and Rating. They might have changed.
 rm -rf Ratings
 rm -rf Genres
+rm -rf Certificates
 
 # Loop through the films and create the IMDB summary
 for FILM in ${FILMS}
 do
-    FILM_TITLE=`echo ${FILM} | sed s'/_/ /g'`
-    #echo ${FILM_TITLE}    
-    php ~/Source/IMDB-to-MPEG/IMDB-to-MPEG.php -t "${FILM_TITLE}" -a
+    # Determine the film title from the directory name.
+    if [ -d ${FILM_STORE}/All/${FILM} ]; then            
+        FILM_TITLE=`echo ${FILM} | sed s'/_/ /g'`   
+        
+        # See if the is a cache imdbid for accurate film summary retrieval
+        if [ -e ${FILM_STORE}/All/${FILM}/.imdbid* ]; then
+            FILM_ID=`ls -1 ${FILM_STORE}/All/${FILM}/.imdbid* | head -n1 | cut -f2 -d'.' | cut -f2 -d'_'`            
+            echo ${FILM_TITLE} : ${FILM_ID}                    
+            php ~/Source/IMDB-to-MPEG/IMDB-to-MPEG.php -i "${FILM_ID}" -a            
+        else
+            FILM_ID=""        
+            echo ${FILM_TITLE}
+            php ~/Source/IMDB-to-MPEG/IMDB-to-MPEG.php -t "${FILM_TITLE}" -a            
+        fi
+    fi
+
 done
 
 exit

@@ -40,6 +40,10 @@ define("FILENAME_WORD_SPACE_CHAR", "_");
 // set the font size
 define("TEXT_FONTSIZE", "18");
 
+// What country are you in? Used to get the film classification.
+define("COUNTRY", "UK");
+//define("COUNTRY", "USA");
+
 $supported_output = array(
 	'm4v' => 'H.264 video and AAC audio',
 	'mp4' => 'H.264 video and AAC audio',
@@ -311,7 +315,45 @@ class IMDB_to_MPEG {
     	$this->videoInfo['rating']      = $this->imdbMovie->rating();
 	    $this->videoInfo['votes']       = $this->imdbMovie->votes();
     	$this->videoInfo['coverPhotoURL'] = $this->imdbMovie->photo(false);
-
+    	if (is_array($this->imdbMovie->mpaa())) {    
+    	    $certificate_array = $this->imdbMovie->mpaa();
+        	$this->videoInfo['certificate'] = $certificate_array[COUNTRY];    	   	
+        	echo($this->videoInfo['certificate'] . "\n");
+    	} else {
+        	$this->videoInfo['certificate'] = '';
+    	    echo "ERROR: Classification not found\n";
+    	    exit(1);
+    	}
+/*    	
+    	print_r($this->videoInfo['mpaa']);
+Displaying : First matchArray
+(
+    [Ireland] => 15A
+    [UK] => 15
+    [USA] => R
+    [Portugal] => M/16
+    [Canada] => 14A
+    [Finland] => K-15
+    [Norway] => 15
+    [Malaysia] => 18PL
+    [Singapore] => M18
+    [Germany] => 12
+    [Brazil] => 16
+    [Philippines] => R-13
+    [Switzerland] => 14
+    [Australia] => MA
+    [Netherlands] => 16
+    [New Zealand] => R16
+    [South Korea] => 15
+    [Argentina] => 13
+    [Japan] => PG-12
+    [Denmark] => 11
+    [Austria] => 16
+    [South Africa] => 16LV
+    [Iceland] => 16
+    [Mexico] => B15
+)    	
+*/    	
 	    $cleanTitle = str_replace(' ', FILENAME_WORD_SPACE_CHAR, $this->videoInfo['title']);
     	$cleanTitle = str_replace('&', 'and', $cleanTitle);
 	    $cleanTitle = str_replace(array("'"), '', $cleanTitle);
