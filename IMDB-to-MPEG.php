@@ -54,6 +54,19 @@ function debug($text) {
     }
 }
 
+// Compat Functions
+function str_cleaner($string_in, $strip_double_quotes = false)
+{   
+    $string_tmp = trim($string_in);
+    $string_tmp = strip_tags($string_tmp);    
+    $string_tmp = html_entity_decode($string_tmp, ENT_COMPAT, 'UTF-8');
+    if (strip_double_quotes)
+    {
+        $string_tmp = str_replace('"', '', $string_tmp);
+    }
+    return($string_tmp);
+}
+
 // Usage information
 function usage() {
     echo ("Usage\n");
@@ -329,11 +342,12 @@ class IMDB_to_MPEG {
         } else {
             $this->videoInfo['certificate'] = '';
         }
-        
+
+        // Remove special chars from the "clean" title.
         $cleanTitle = str_replace(' ', FILENAME_WORD_SPACE_CHAR, $this->videoInfo['title']);
-        $cleanTitle = str_replace('&', 'and', $cleanTitle);
-        $cleanTitle = str_replace(array("'"), '', $cleanTitle);
-        $this->videoInfo['cleanTitle'] = str_replace(array("·", "/"), '-', $cleanTitle);
+        $cleanTitle = str_replace('&', 'and', $cleanTitle);        
+        $cleanTitle = str_replace(array("'", ".", ",", ":"), '', $cleanTitle);                
+        $this->videoInfo['cleanTitle'] = str_replace(array("·", "/"), '_', $cleanTitle);                
 
         if (!empty($this->videoInfo['genres'])) {
             $this->videoInfo['genrestext'] = "Genres: ";
@@ -514,13 +528,36 @@ class IMDB_to_MPEG {
         }
         closedir($d);
         
+        $this->basedir = $basedir;
         return $basedir;
     }
+
+    public function buildAudioFrames() {
+        // Setup our audio sample parameters
+        $this->NrChannels=2;
+        $this->SampleRate=48000;
+        $this->NrSeconds=20;
+
+        echo("Generating audio frames...");
+        // Calcualte the sample size.
+        $sample_size = $this->SampleRate * $this->NrChannels * $this->NrSeconds;
+
+        // Create some silence.
+        $silence = '';
+        while(strlen($silence) < $sample_size) $silence .= chr(0);
+
+        // Write our silence to a file.
+        $fp = fopen($this->basedir . 'silence.raw', 'w');
+        fwrite($fp, $silence);
+        fclose($fp);
+        echo " done\n";            
+    }        
 
     public function buildVideoFrames($frameRate = 24) {
         
         // Prepare the tempory directory where the frame will be created.
-        $basedir = $this->prepareTemp();    
+        $basedir = $this->prepareTemp();  
+        $this->buildAudioFrames();
     
         $width = $this->resolution['width'];
         $height = $this->resolution['height'];
@@ -769,14 +806,25 @@ class IMDB_to_MPEG {
             $videoFormat = "MPEG-4";
         }
         
+        //$cmd = 'ffmpeg -ar ' . $SampleRate . ' -acodec pcm_s16le -f s16le -ac ' . $NrChannels . ' -i silence_php.raw silence_php.wav';
+        //`$cmd`                
+        
+        if ($this->resolution['width'] > 999) {            
+            $video_bitrate= ($this->resolution['width'] - 100) * 100;        
+        } else {
+            $video_bitrate= ($this->resolution['width'] - 100) * 1000;        
+        }
+        echo $video_bitrate . "\n";
+            
+        echo "Encoding $videoFormat...";                            
         // Make the appropriate video clip
         if ($videoFormat = "MPEG-4") {
-            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -vcodec libxvid -b 640000 -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4" 2>' . $frameDir . '/ffmpeg.log'; 
+            
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec libxvid -b ' . $video_bitrate . ' -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4" 2>' . $frameDir . '/ffmpeg.log'; 
         } elseif ($videoFormat = "MPEG-2") {
-            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -vcodec mpeg2video -b 640000 -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg" 2>' . $frameDir . '/ffmpeg.log'; 
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec mpeg2video -b ' . $video_bitrate . '  -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg" 2>' . $frameDir . '/ffmpeg.log'; 
         }
-                        
-        echo "Encoding video frames...";
+                                
         `$cmd`;
         echo " done\n";        
     }
@@ -786,7 +834,7 @@ class IMDB_to_MPEG {
         $frameRate = 24;
 
         $this->getCoverPhoto();
-        $framedir = $this->buildVideoFrames($frameRate);
+        $framedir = $this->buildVideoFrames($frameRate);        
         switch ($this->output_type) {
             case 'm4v':
             case 'mp4':
@@ -824,19 +872,6 @@ class IMDB_to_MPEG {
             @symlink('../../All/' . $this->videoInfo['cleanTitle'], 'Certificate/' . $this->videoInfo['certificate'] . '/' . $this->videoInfo['cleanTitle']);
         }    
     }
-}
-
-// Compat Functions
-function str_cleaner($string_in, $strip_double_quotes = false)
-{   
-    $string_tmp = trim($string_in);
-    $string_tmp = strip_tags($string_tmp);    
-    $string_tmp = html_entity_decode($string_tmp, ENT_COMPAT, 'UTF-8');
-    if (strip_double_quotes)
-    {
-        $string_tmp = str_replace('"', '', $string_tmp);
-    }
-    return($string_tmp);
 }
 
 $i2m = new IMDB_to_MPEG($options);
