@@ -198,7 +198,7 @@ v2.0 2009, 5th September.
 v1.2 2009, 17th July.
  - Merged extensive contributions from Eric, http://www.ypass.net. Thanks Eric!
  - Updated the README to reflect Eric's changes.
- - Not publically released.
+ - Never released to the public.
 
 v1.1 2009, 23rd April.
  - Fixed a bug where the film name has a forward slash (/) in it the files and

@@ -45,7 +45,7 @@ echo("IMDB-to-MPG v" . VERSION . " - Create a MPEG video summarising a movie usi
 echo("Copyright (c) 2009 Flexion.Org, http://flexion.org. GPLv2 License.\n");
 echo("\n");
 
-require(dirname(__FILE__) . '/imdbphp-1.1.4/imdb.class.php');
+require(dirname(__FILE__) . '/imdbphp/imdb.class.php');
 
 // Debug output function
 function debug($text) {
