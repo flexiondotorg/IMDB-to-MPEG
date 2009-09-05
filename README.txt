@@ -180,11 +180,13 @@ References
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
  - http://projects.izzysoft.de/trac/imdbphp
 
-v2.0 2009, 1st September.
+v2.0 2009, 5th September.
  - Merged yet more contributions from Eric, http://www.ypass.net. Thanks Eric!
  - Added usage instructions.
  - Added MPEG-2 video encoding.
  - Added categorisation by Certificate.
+ - Added dynamic computation of video bitrate.
+ - Added silent audio generation.
  - Improved video encoding speed by removing pre-processing with 'jpeg2yuv'.
  - Fixed spiffy animations when cover art is not available.
  - Fixed spiffy animations of platforms that may have incomplete GD.

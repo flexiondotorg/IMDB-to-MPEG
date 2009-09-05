@@ -445,14 +445,14 @@ class IMDB_to_MPEG {
         return true;
     }
 
-    public function createTextFrame($width, $height, $fontSize = 18) {
+    public function createTextFrame($width, $height, $fontSize = 14) {
         $fontName = "Vera.ttf";
         $fontPath = dirname(__FILE__) . '/' . $fontName;
         $frameWidth = $width;
         $frameHeight = $height;
-        $wrapLength = 54;
-        $rightMargin = 20;  // the right margin needs to be handled by the caller
-        $vertialMargin = 20;
+        $wrapLength = 58;
+        $rightMargin = 2;  // the right margin needs to be handled by the caller
+        $vertialMargin = 2;
 
         debug("Creating the text frame with font size $fontSize");
         // how big is our text going to be?
@@ -503,20 +503,20 @@ class IMDB_to_MPEG {
     
         // Create temporary files in the temporary files directory using 
         // sys_get_temp_dir()
-        $basedir = sys_get_temp_dir() . '/i2m/';        
+        $this->basedir = sys_get_temp_dir() . '/i2m/';                
 
         // make our temp dir if it doesn't exist
-        @mkdir($basedir);
+        @mkdir($this->basedir);
 
         // make sure we can write to it (isn't there an "is writable function or something?)
-        if (! @touch($basedir . "test")) {
-            echo "ERROR: Temp directory is not writable: $basedir\n\n";
+        if (! @touch($this->basedir . "test")) {
+            echo "ERROR: Temp directory is not writable: $this->basedir\n\n";
             exit(1);
         }
 
         // delete anything in there
-        if (! $d = opendir($basedir)) {
-            echo "ERROR: Could not open temp directory: $basedir\n\n";
+        if (! $d = opendir($this->basedir)) {
+            echo "ERROR: Could not open temp directory: $this->basedir\n\n";
             exit(1);
         }
 
@@ -524,12 +524,9 @@ class IMDB_to_MPEG {
             if ($dirent == "." || $dirent == "..") {
                 continue;
             }
-            unlink($basedir . $dirent);
+            unlink($this->basedir . $dirent);
         }
-        closedir($d);
-        
-        $this->basedir = $basedir;
-        return $basedir;
+        closedir($d);                        
     }
 
     public function buildAudioFrames() {
@@ -554,11 +551,7 @@ class IMDB_to_MPEG {
     }        
 
     public function buildVideoFrames($frameRate = 24) {
-        
-        // Prepare the tempory directory where the frame will be created.
-        $basedir = $this->prepareTemp();  
-        $this->buildAudioFrames();
-    
+            
         $width = $this->resolution['width'];
         $height = $this->resolution['height'];
         $fadetime = $this->fadetime;
@@ -646,7 +639,7 @@ class IMDB_to_MPEG {
                     imagefilter($newframe, IMG_FILTER_BRIGHTNESS, (int)($curlevel += $brightChangePerFrame));
                 }           
 
-                $framefilename = sprintf("%s/frame_%04d.jpg", $basedir, $frameCount);
+                $framefilename = sprintf("%s/frame_%04d.jpg", $this->basedir, $frameCount);
                 imagejpeg($newframe, $framefilename);
             }
 
@@ -654,7 +647,7 @@ class IMDB_to_MPEG {
             debug("displaying the cover");
             $coverDisplayFrames = $coverDisplayTime * $frameRate;
             for ($ctr = 0; $ctr < $coverDisplayFrames; $ctr++, $frameCount++) {
-                $framefilename = sprintf("%s/frame_%04d.jpg", $basedir, $frameCount);
+                $framefilename = sprintf("%s/frame_%04d.jpg", $this->basedir, $frameCount);
                 imagejpeg($frame, $framefilename);
             }
 
@@ -672,7 +665,7 @@ class IMDB_to_MPEG {
                 if (function_exists('imagefilter')) {               
                     imagefilter($newframe, IMG_FILTER_BRIGHTNESS, (int)($curlevel -= $brightChangePerFrame));
                 }
-                $framefilename = sprintf("%s/frame_%04d.jpg", $basedir, $frameCount);
+                $framefilename = sprintf("%s/frame_%04d.jpg", $this->basedir, $frameCount);
                 imagejpeg($newframe, $framefilename);
                 imagedestroy($newframe);
             }
@@ -685,8 +678,8 @@ class IMDB_to_MPEG {
             $shrinkToHeight = $height * (float)($shrinkToWidth / $width);
 
             // where is the upper left endpoint for the image... 2% sounds good..
-            $moveToX = (int)($width * 0.02);
-            $moveToY = (int)($height * 0.10);
+            $moveToX = (int)($width * 0.05);
+            $moveToY = (int)($height * 0.02);
 
             // now we have $fadeframes seconds to deal with it.. oh boy... i
             // was told there would be no math
@@ -720,7 +713,7 @@ class IMDB_to_MPEG {
                 $curH = ($curW * $aspectRatio);
                 debug("new size is $curW x $curH");
                 imagecopyresampled($newframe, $coverPhoto, $curX, $curY, 0, 0, $curW, $curH, $cX, $cY);
-                $framefilename = sprintf("%s/frame_%04d.jpg", $basedir, $frameCount);
+                $framefilename = sprintf("%s/frame_%04d.jpg", $this->basedir, $frameCount);
                 $frameCount++;
                 imagejpeg($newframe, $framefilename);
                 // need to save the last guy as a reference for the next frame
@@ -730,23 +723,23 @@ class IMDB_to_MPEG {
                     imagedestroy($newframe);
                 }
             }
-
             debug("Arrived at $curX x $curY");
-            debug("We're doing moving and resizing");
+            debug("We're doing moving and resizing");                    
         }// $frame is set to the last frame in that sequence
         else
         {
             // We didn't find any cover art so just make a frame.
-            $frame = imagecreatetruecolor($width, $height);                     
+            $frame = imagecreatetruecolor($width, $height);                                 
         }       
+
+        // get ourselves the partial frame accounting for the cover image                       
+        $subframeW = imagesx($frame) * 0.85;
+        $subframeH = imagesy($frame);
 
         /*
         * Same for the text... fade it in, wait a the lenght, but DO NOT fade it out
         */
-        // get ourselves the partial frame accounting for the cover image                       
-        $subframeW = imagesx($frame) * 0.85 - 50;
-        $subframeH = imagesy($frame);
-               
+                       
         debug("We have $subframeW x $subframeH to do this thing....");
         $textsubframe = $this->createTextFrame($subframeW, $subframeH);
 
@@ -765,7 +758,7 @@ class IMDB_to_MPEG {
             
             // now copy the new subframe onto our ref frame
             imagecopy($newframe, $newsubframe, $width * 0.15 + 50, 0, 0, 0, $subframeW, $subframeH);
-            $framefilename = sprintf("%s/frame_%04d.jpg", $basedir, $frameCount);
+            $framefilename = sprintf("%s/frame_%04d.jpg", $this->basedir, $frameCount);
             imagejpeg($newframe, $framefilename);
             if ($ctr == $fadeframes-1) {
                 $frame = $newframe;
@@ -779,18 +772,19 @@ class IMDB_to_MPEG {
         debug("displaying the text");
         $textDisplayFrames = $textDisplayTime * $frameRate;
         for ($ctr = 0; $ctr < $textDisplayFrames; $ctr++, $frameCount++) {
-            $framefilename = sprintf("%s/frame_%04d.jpg", $basedir, $frameCount);
+            $framefilename = sprintf("%s/frame_%04d.jpg", $this->basedir, $frameCount);
             imagejpeg($frame, $framefilename);
         }
 
         // don't need this anymore
         imagedestroy($frame);
-        echo " done\n";
-        
-        return($basedir);
+        echo " done\n";                
     }
 
-    public function makeMPEG($frameRate, $frameDir, $videoFormat = "MPEG-4") {
+    public function makeMPEG($frameRate, $videoFormat = "MPEG-4") {
+        
+        $frameDir = $this->basedir;
+        
         $this->infoMovieFile = $outputFileName = "About" . FILENAME_WORD_SPACE_CHAR . $this->videoInfo['cleanTitle'];  
     
         //Remove any previous, and possible old, summary clips.
@@ -805,24 +799,21 @@ class IMDB_to_MPEG {
         if ($videoFormat != "MPEG-2" || $videoFormat != "MPEG-4") {
             $videoFormat = "MPEG-4";
         }
-        
-        //$cmd = 'ffmpeg -ar ' . $SampleRate . ' -acodec pcm_s16le -f s16le -ac ' . $NrChannels . ' -i silence_php.raw silence_php.wav';
-        //`$cmd`                
-        
+         
+        // This is a pretty rough calculation but suffcient for most purposes.        
         if ($this->resolution['width'] > 999) {            
-            $video_bitrate= ($this->resolution['width'] - 100) * 100;        
+            $videoBitrate= ($this->resolution['width'] - 100) * 100;        
         } else {
-            $video_bitrate= ($this->resolution['width'] - 100) * 1000;        
+            $videoBitrate= ($this->resolution['width'] - 100) * 1000;        
         }
-        echo $video_bitrate . "\n";
             
-        echo "Encoding $videoFormat...";                            
+        echo "Encoding " . $videoFormat . "...";                            
         // Make the appropriate video clip
         if ($videoFormat = "MPEG-4") {
             
-            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec libxvid -b ' . $video_bitrate . ' -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4" 2>' . $frameDir . '/ffmpeg.log'; 
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec libxvid -b ' . $videoBitrate . ' -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4" 2>' . $frameDir . '/ffmpeg.log'; 
         } elseif ($videoFormat = "MPEG-2") {
-            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec mpeg2video -b ' . $video_bitrate . '  -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg" 2>' . $frameDir . '/ffmpeg.log'; 
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec mpeg2video -b ' . $videoBitrate . '  -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg" 2>' . $frameDir . '/ffmpeg.log'; 
         }
                                 
         `$cmd`;
@@ -833,16 +824,18 @@ class IMDB_to_MPEG {
         // maybe these should be dynamic?
         $frameRate = 24;
 
+        $this->prepareTemp();
         $this->getCoverPhoto();
-        $framedir = $this->buildVideoFrames($frameRate);        
+        $this->buildAudioFrames();
+        $this->buildVideoFrames($frameRate);        
         switch ($this->output_type) {
             case 'm4v':
             case 'mp4':
-                $this->makeMPEG($frameRate, $framedir, 'MPEG-4');
+                $this->makeMPEG($frameRate, 'MPEG-4');
                 break;
             case 'm2v':
             case 'mpg':                             
-                $this->makeMPEG($frameRate, $framedir, 'MPEG-2');
+                $this->makeMPEG($frameRate, 'MPEG-2');
                 break;          
         }
     }

@@ -2,7 +2,7 @@
 
 function build {
     RELEASE_NAME="IMDB-to-MPEG"
-    RELEASE_VER=1.1
+    RELEASE_VER=2.0
 
     rm ${RELEASE_NAME}-v${RELEASE_VER}.tar* 2>/dev/null
     bzr export ${RELEASE_NAME}-v${RELEASE_VER}.tar
