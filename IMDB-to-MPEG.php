@@ -809,9 +809,8 @@ class IMDB_to_MPEG {
             
         echo "Encoding " . $videoFormat . "...";                            
         // Make the appropriate video clip
-        if ($videoFormat = "MPEG-4") {
-            
-            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec libxvid -b ' . $videoBitrate . ' -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4" 2>' . $frameDir . '/ffmpeg.log'; 
+        if ($videoFormat = "MPEG-4") {            
+            $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec libx264 -b ' . $videoBitrate . ' -acodec libfaac -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f mp4 "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mp4" 2>' . $frameDir . '/ffmpeg.log'; 
         } elseif ($videoFormat = "MPEG-2") {
             $cmd = 'ffmpeg -v -1 -y -r ' . $frameRate . ' -f image2 -i "' . $frameDir . '/frame_%04d.jpg" -f s16le -i "' . $frameDir . 'silence.raw" -vcodec mpeg2video -b ' . $videoBitrate . '  -acodec mp2 -ab 48k -ar 48000 -ac 2 -s ' . $this->resolution['width'] . 'x' . $this->resolution['height'] . ' -f dvd "All/' . $this->videoInfo['cleanTitle'] . '/' . $outputFileName . '.mpg" 2>' . $frameDir . '/ffmpeg.log'; 
         }

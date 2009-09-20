@@ -141,6 +141,7 @@ this.
 |   `-- The_Usual_Suspects
 |       `-- About_The_Usual_Suspects.mp4
 |       `-- The_Usual_Suspects.mpg
+|       `__ .imdbid_0114814
 |-- Certificate
 |   `-- 18
 |       `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
@@ -155,16 +156,23 @@ this.
     `-- 8
         `-- The_Usual_Suspects -> ../../All/The_Usual_Suspects
 
+You'll noticed the hidden '.imdbid_#######' file in the movie directory as well. 
+This so you can go through and re-encode the summary video and be sure that you 
+get the right movie. See the 'imdb_all_films.sh' in the 'contrib' directory for
+an example of how to use them.
+
 Requirements
 
  - ffmpeg, php5-cli, php5-gd
- - An OS such as Linux, FreeBSD, Solaris, Mac OS X is required for 
-   categorisation to work
+ - An OS such as Linux, FreeBSD, Solaris, Mac OS X is required for categorisation 
+   to work
 
 Known Limitations
 
  - Categorisation doen't work on Windows as it doesn't have sym-link capability.
  - Categorisation doen't work on FAT32 file systems.
+ - Some 'ffmpeg' builds may be missing x264 support or x264 support is borked. 
+   If you encounter this, use MPEG-2 video.
 
 Source Code
 
@@ -180,24 +188,24 @@ References
  - http://avalanched.wordpress.com/2008/03/17/imdb-api-beta/
  - http://projects.izzysoft.de/trac/imdbphp
 
-v2.0 2009, 5th September.
+v2.0 2009, 19th September.
  - Merged yet more contributions from Eric, http://www.ypass.net. Thanks Eric!
  - Added usage instructions.
- - Added MPEG-2 video encoding.
  - Added categorisation by Certificate.
  - Added dynamic computation of video bitrate.
  - Added silent audio generation.
+ - Added a shell script to reprocess an entire film store.
+ - Re-added MPEG-2 video encoding. 
  - Improved video encoding speed by removing pre-processing with 'jpeg2yuv'.
  - Fixed spiffy animations when cover art is not available.
- - Fixed spiffy animations of platforms that may have incomplete GD.
+ - Fixed spiffy animations on platforms that may have incomplete GD.
  - Modified filename input so that an input filename is optional rather than 
    mandatory.
- - Modified MPEG-4 video encoding to use XviD instead of x264 so that 
-   compatibility with different build of 'ffmpeg' is assured.
 
 v1.2 2009, 17th July.
  - Merged extensive contributions from Eric, http://www.ypass.net. Thanks Eric!
  - Updated the README to reflect Eric's changes.
+ - MPEG-4 video encoding replaced MPEG-2 video encoding.
  - Never released to the public.
 
 v1.1 2009, 23rd April.
