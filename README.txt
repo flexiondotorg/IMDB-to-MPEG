@@ -29,12 +29,11 @@ sold with any software.
 
 Introduction
 
-I run Mediatomb DLNA server with my PS3 as the client. I am working towards 
-importing my entire DVD and Blu-Ray collection into my Mediatomb server. 
-However, my wife wants to know something about each film in the library without 
-having to dig out the DVD case from storage. My solution is to include a MPEG 
-video displaying the film summary in the Mediatomb library so it can be easily 
-viewed from the PS3.
+I run a DLNA server with my PS3 as the client. I am working towards importing my 
+entire DVD and Blu-Ray collection into my DLNA server. However, my wife wants to 
+know something about each film in the library without having to dig out the 
+DVD case from storage. My solution is to include a video clip which displays the 
+film summary so it can be easily viewed from the PS3.
 
 Usage
 
@@ -176,11 +175,9 @@ Known Limitations
 
 Source Code
 
-You can checkout the current branch from my Bazaar repository. This is a 
-read-only repository, get in touch if you want to contribute and require write 
-access.
+You can grab the source from Launchpad. Contributions are welcome :-)
 
- bzr co http://code.flexion.org/Bazaar/IMDB-to-MPEG/
+ - https://code.launchpad.net/~flexiondotorg
 
 References
 
