@@ -1,3 +1,7 @@
+############################################################
+# This project is inactive and archived here for reference #
+############################################################
+
 License
 
 Create a MPEG video summarising a movie using data from IMDB
